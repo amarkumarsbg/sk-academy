@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SK Academy — School Management System (Frontend Demo)
+
+A modern, full-stack-ready frontend demo for **SK Academy** with two connected portals:
+
+- **Public Website** — About, Admissions, Academics, Events, News, Gallery, Contact
+- **Admin Portal** — Dashboard, Students, Teachers, Admissions, Attendance, Fees, Exams, Results, Notices, Events, CMS, Settings
+
+> **Note:** This is a **frontend-only demo** with mock data. Backend API, database, and authentication will be added in a future phase.
+
+## Tech Stack
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS v4**
+- **shadcn/ui**
+- **Lucide Icons**
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) for the public site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Staff Portal:** [http://localhost:3000/admin/login](http://localhost:3000/admin/login) → click "Sign In (Demo)" to enter the admin dashboard.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+src/
+├── app/
+│   ├── (public)/          # Public website pages
+│   └── admin/
+│       ├── login/         # Demo login page
+│       └── (portal)/      # Admin dashboard & modules
+├── components/
+│   ├── public/            # Header, footer, hero
+│   └── admin/             # Sidebar, data tables
+├── data/mock/             # Mock data (replace with API later)
+└── lib/config.ts          # Site config & navigation
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Future Backend Integration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+When ready, replace mock data in `src/data/mock/` with API calls to:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- PostgreSQL + Prisma
+- Auth.js for staff login & RBAC
+- REST or tRPC API routes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Forms and action buttons are intentionally disabled or demo-only until the backend is built.

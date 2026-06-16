@@ -15,9 +15,9 @@ type SchoolLogoProps = {
 };
 
 const sizeMap = {
-  xs: { className: "h-8 w-8", width: 32, height: 32 },
-  sm: { className: "h-10 w-10", width: 40, height: 40 },
-  md: { className: "h-12 w-12", width: 48, height: 48 },
+  xs: { className: "h-10 w-10", width: 40, height: 40 },
+  sm: { className: "h-12 w-12", width: 48, height: 48 },
+  md: { className: "h-14 w-14", width: 56, height: 56 },
   lg: { className: "h-16 w-16", width: 64, height: 64 },
   xl: { className: "h-24 w-24", width: 96, height: 96 },
   hero: { className: "h-36 w-36 sm:h-44 sm:w-44", width: 176, height: 176 },

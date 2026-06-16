@@ -9,7 +9,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { defaultSiteContent, STORAGE_KEY } from "@/data/default-content";
+import { defaultSiteContent, STORAGE_KEY, CONTENT_VERSION_KEY, CONTENT_VERSION } from "@/data/default-content";
+import { mergeStoredSiteContent } from "@/lib/merge-site-content";
 import type { SiteContent } from "@/types/site-content";
 
 interface SiteContentContextValue {
@@ -27,9 +28,17 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      const storedVersion = localStorage.getItem(CONTENT_VERSION_KEY);
+      if (storedVersion !== String(CONTENT_VERSION)) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(CONTENT_VERSION_KEY, String(CONTENT_VERSION));
+      }
+
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setContent({ ...defaultSiteContent, ...JSON.parse(stored) });
+        setContent(mergeStoredSiteContent(JSON.parse(stored)));
+      } else {
+        setContent(defaultSiteContent);
       }
     } catch {
       setContent(defaultSiteContent);

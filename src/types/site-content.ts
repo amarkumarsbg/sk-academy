@@ -100,6 +100,7 @@ export interface GalleryAlbum {
   title: string;
   count: number;
   cover: string;
+  photos?: string[];
 }
 
 export interface AcademicLevel {

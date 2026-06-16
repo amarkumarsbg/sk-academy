@@ -51,14 +51,16 @@ export function HeroCarousel() {
           )}
           aria-hidden={index !== active}
         >
-          <ContentImage
-            src={slide.image}
-            alt={slide.title}
-            fill
-            priority={index === 0}
-            className="object-cover"
-            sizes="100vw"
-          />
+          <div className="relative h-full w-full">
+            <ContentImage
+              src={slide.image}
+              alt={slide.title}
+              fill
+              priority={index === 0}
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/55 to-primary/20" />
 
           <div className="relative z-10 flex h-full items-center">

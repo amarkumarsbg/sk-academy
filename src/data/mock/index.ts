@@ -1,46 +1,46 @@
 export const stats = [
   { label: "Students Enrolled", value: "2,450+" },
   { label: "Expert Teachers", value: "120+" },
-  { label: "Years of Excellence", value: "15+" },
+  { label: "Years of Excellence", value: "16+" },
   { label: "Success Rate", value: "98%" },
 ];
 
 export const newsItems = [
   {
     id: "1",
-    title: "Annual Science Exhibition 2026",
+    title: "Annual Function 2026",
     excerpt:
-      "Students showcased innovative projects in robotics, environmental science, and biotechnology.",
+      "Students and staff came together for a memorable annual celebration on stage.",
     date: "2026-06-10",
-    category: "Academics",
-    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80",
+    category: "Events",
+    image: "/images/annual-function.png",
   },
   {
     id: "2",
-    title: "SK Academy Tops District Board Results",
+    title: "Morning Assembly at SK Academy",
     excerpt:
-      "Congratulations to our Class XII students for achieving a 100% pass rate with 45 distinctions.",
+      "Daily assembly instils discipline, values, and unity among our students.",
     date: "2026-05-28",
-    category: "Achievement",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80",
+    category: "Campus Life",
+    image: "/images/assembly-prayer.png",
   },
   {
     id: "3",
-    title: "New Smart Classrooms Inaugurated",
+    title: "Inauguration & Special Ceremonies",
     excerpt:
-      "State-of-the-art digital learning facilities now available for classes VI through XII.",
+      "Ribbon-cutting ceremonies mark proud milestones in our school's journey.",
     date: "2026-05-15",
-    category: "Infrastructure",
-    image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80",
+    category: "Achievement",
+    image: "/images/ribbon-cutting.png",
   },
   {
     id: "4",
-    title: "Inter-School Sports Meet Champions",
+    title: "Student Celebrations",
     excerpt:
-      "Our athletics team won the overall championship trophy at the regional sports meet.",
+      "Birthdays and school events filled with joy, laughter, and togetherness.",
     date: "2026-04-22",
-    category: "Sports",
-    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba7951?w=800&q=80",
+    category: "Events",
+    image: "/images/celebration-event.png",
   },
 ];
 
@@ -82,39 +82,50 @@ export const events = [
 export const galleryAlbums = [
   {
     id: "1",
-    title: "Annual Day 2025",
-    count: 24,
-    cover: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80",
+    title: "Annual Function",
+    count: 3,
+    cover: "/images/annual-function.png",
+    photos: ["/images/annual-function.png", "/images/staff-group.png", "/images/school-event.png"],
   },
   {
     id: "2",
-    title: "Sports Day",
-    count: 18,
-    cover: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80",
+    title: "Morning Assembly",
+    count: 2,
+    cover: "/images/assembly-prayer.png",
+    photos: ["/images/assembly-prayer.png", "/images/assembly-hall.png"],
   },
   {
     id: "3",
-    title: "Science Lab",
-    count: 12,
-    cover: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&q=80",
+    title: "Celebrations",
+    count: 4,
+    cover: "/images/celebration-cake.png",
+    photos: [
+      "/images/celebration-cake.png",
+      "/images/birthday-celebration.png",
+      "/images/celebration-event.png",
+      "/images/school-event.png",
+    ],
   },
   {
     id: "4",
-    title: "Library & Campus",
-    count: 15,
-    cover: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&q=80",
+    title: "Ceremonies",
+    count: 1,
+    cover: "/images/ribbon-cutting.png",
+    photos: ["/images/ribbon-cutting.png"],
   },
   {
     id: "5",
-    title: "Art & Culture",
-    count: 20,
-    cover: "https://images.unsplash.com/photo-1460661419341-7d1487c1872b?w=600&q=80",
+    title: "Staff & Events",
+    count: 2,
+    cover: "/images/staff-group.png",
+    photos: ["/images/staff-group.png", "/images/annual-function.png"],
   },
   {
     id: "6",
-    title: "Classroom Learning",
-    count: 16,
-    cover: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80",
+    title: "Campus Life",
+    count: 2,
+    cover: "/images/assembly-hall.png",
+    photos: ["/images/assembly-hall.png", "/images/assembly-prayer.png"],
   },
 ];
 

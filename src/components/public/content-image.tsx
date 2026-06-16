@@ -7,7 +7,17 @@ type ContentImageProps = Omit<ImageProps, "src"> & {
 };
 
 export function ContentImage({ src, alt, ...props }: ContentImageProps) {
-  const isDataUrl = src.startsWith("data:");
+  if (!src) return null;
 
-  return <Image src={src} alt={alt} unoptimized={isDataUrl} {...props} />;
+  const isDataUrl = src.startsWith("data:");
+  const isLocalAsset = src.startsWith("/");
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      unoptimized={isDataUrl || isLocalAsset}
+      {...props}
+    />
+  );
 }

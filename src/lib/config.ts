@@ -4,12 +4,12 @@ export const siteConfig = {
   description:
     "A premier institution in Kahalgaon, Bhagalpur, dedicated to nurturing young minds through quality education, holistic development, and strong values.",
   location: "Kahalgaon, Bhagalpur",
-  establishedYear: 2011,
+  establishedYear: 2010,
   email: "info@skacademy.edu",
   admissionsEmail: "admissions@skacademy.edu",
   phone: "+91 98765 43210",
   address: "SK Academy, Kahalgaon, Bhagalpur, Bihar, India",
-  logo: "/logo.png",
+  logo: "/logo.png?v=2",
   social: {
     facebook: "https://facebook.com",
     instagram: "https://instagram.com",

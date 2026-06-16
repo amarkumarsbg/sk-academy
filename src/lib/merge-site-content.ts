@@ -60,6 +60,7 @@ export function mergeStoredSiteContent(stored: Partial<SiteContent>): SiteConten
       ...defaultSiteContent.footer,
       ...stored.footer,
       mapEmbedUrl: normalizeMapEmbedUrl(stored.footer?.mapEmbedUrl),
+      schoolTimings: stored.contact?.officeHours ?? defaultSiteContent.contact.officeHours,
     },
     pageHeroes: { ...defaultSiteContent.pageHeroes, ...stored.pageHeroes },
     heroSlides: stored.heroSlides ?? defaultSiteContent.heroSlides,

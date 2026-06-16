@@ -18,6 +18,18 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  openGraph: {
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    type: "website",
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
   icons: {
     icon: [{ url: "/logo.png", type: "image/png" }],
     shortcut: [{ url: "/logo.png", type: "image/png" }],

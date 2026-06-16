@@ -86,12 +86,19 @@ export interface PageHeroContent {
   description: string;
 }
 
+export type NewsCategory =
+  | "Notice"
+  | "Announcement"
+  | "Achievement"
+  | "Event"
+  | "Admission Update";
+
 export interface NewsItem {
   id: string;
   title: string;
   excerpt: string;
   date: string;
-  category: string;
+  category: NewsCategory | string;
   image: string;
 }
 

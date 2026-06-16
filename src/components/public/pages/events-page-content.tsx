@@ -1,40 +1,54 @@
 "use client";
 
+import { useState } from "react";
+import { EventCard } from "@/components/public/event-card";
+import { PageCta } from "@/components/public/page-cta";
 import { PageHero } from "@/components/public/page-hero";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PageSection } from "@/components/public/page-section";
+import { SectionHeading } from "@/components/public/section-heading";
+import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/context/site-content-provider";
-import { formatDay, formatMonthShort, formatYear } from "@/lib/format-date";
+
+const EVENT_CATEGORIES = ["All", "Meeting", "Cultural", "Academic", "Workshop", "Sports"] as const;
 
 export function EventsPageContent() {
   const { content } = useSiteContent();
   const { events, pageHeroes } = content;
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  const filteredEvents =
+    activeCategory === "All" ? events : events.filter((event) => event.type === activeCategory);
 
   return (
     <>
       <PageHero title={pageHeroes.events.title} description={pageHeroes.events.description} />
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="space-y-4">
-            {events.map((event) => (
-              <Card key={event.id}>
-                <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center">
-                  <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                    <span className="text-xs font-medium uppercase">{formatMonthShort(event.date)}</span>
-                    <span className="text-2xl font-bold leading-none">{formatDay(event.date)}</span>
-                    <span className="text-xs">{formatYear(event.date)}</span>
-                  </div>
-                  <div className="flex-1">
-                    <Badge variant="secondary" className="mb-1">{event.type}</Badge>
-                    <h3 className="text-lg font-semibold">{event.title}</h3>
-                    <p className="text-sm text-muted-foreground">{event.time} · {event.location}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <PageSection containerClassName="max-w-4xl">
+        <SectionHeading
+          title="Upcoming Events"
+          description="Browse school events by category."
+          centered
+          className="mb-6"
+        />
+        <div className="mb-6 flex flex-wrap justify-center gap-2">
+          {EVENT_CATEGORIES.map((category) => (
+            <Button
+              key={category}
+              type="button"
+              size="sm"
+              variant={activeCategory === category ? "default" : "outline"}
+              onClick={() => setActiveCategory(category)}
+            >
+              {category}
+            </Button>
+          ))}
         </div>
-      </section>
+        <div className="space-y-4">
+          {filteredEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+      </PageSection>
+      <PageCta title="Join Our School Events" description="Admissions are open — become part of the SK Academy community." />
     </>
   );
 }

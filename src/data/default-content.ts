@@ -7,9 +7,14 @@ import {
   events,
   galleryAlbums,
   academics,
-  admissionsSteps,
   notices,
 } from "@/data/mock/index";
+import {
+  admissionsSteps,
+  admissionsEligibilityItems,
+  admissionsImportantDates,
+  OFFICE_HOURS,
+} from "@/data/mock/admissions";
 import { schoolMapEmbedUrl } from "@/lib/school-map";
 
 export const defaultSiteContent: SiteContent = {
@@ -160,39 +165,19 @@ export const defaultSiteContent: SiteContent = {
       description: "Join SK Academy — admissions open for academic year 2026–27.",
     },
     steps: admissionsSteps,
-    eligibilityItems: [
-      "Age-appropriate grade as per CBSE norms",
-      "Birth certificate (original + copy)",
-      "Previous school transfer certificate",
-      "Passport-size photographs (4 nos.)",
-      "Aadhaar card of student and parent",
-      "Previous class report card / mark sheet",
-    ],
-    importantDates: [
-      { label: "Application Opens", date: "January 1, 2026" },
-      { label: "Last Date to Apply", date: "March 31, 2026" },
-      { label: "Entrance Interaction", date: "April 15–30, 2026" },
-      { label: "Session Begins", date: "April 1, 2026" },
-    ],
+    eligibilityItems: admissionsEligibilityItems,
+    importantDates: admissionsImportantDates,
   },
   contact: {
     hero: {
       title: "Contact Us",
       description: "We'd love to hear from you. Reach out for admissions, inquiries, or general information.",
     },
-    officeHours: [
-      "Monday – Friday: 8:00 AM – 3:00 PM",
-      "Saturday: 8:00 AM – 12:00 PM (Admissions only)",
-      "Sunday & Public Holidays: Closed",
-    ],
+    officeHours: [...OFFICE_HOURS],
   },
   footer: {
     backgroundImage: "/images/assembly-hall.png",
-    schoolTimings: [
-      "Monday – Friday: 7:30 AM – 2:30 PM",
-      "Saturday: 8:00 AM – 12:00 PM (Office & Admissions)",
-      "Sunday & Holidays: Closed",
-    ],
+    schoolTimings: [...OFFICE_HOURS],
     brochureUrl: "/admissions#brochure",
     mapEmbedUrl: schoolMapEmbedUrl,
   },
@@ -214,4 +199,4 @@ export const defaultSiteContent: SiteContent = {
 
 export const STORAGE_KEY = "sk-academy-site-content";
 export const CONTENT_VERSION_KEY = "sk-academy-content-version";
-export const CONTENT_VERSION = 4;
+export const CONTENT_VERSION = 5;

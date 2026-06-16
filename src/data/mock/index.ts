@@ -9,38 +9,50 @@ export const newsItems = [
   {
     id: "1",
     title: "Annual Function 2026",
-    excerpt:
-      "Students and staff came together for a memorable annual celebration on stage.",
+    excerpt: "Students and staff came together for a memorable annual celebration on stage.",
     date: "2026-06-10",
-    category: "Events",
+    category: "Event",
     image: "/images/annual-function.png",
   },
   {
     id: "2",
-    title: "Morning Assembly at SK Academy",
-    excerpt:
-      "Daily assembly instils discipline, values, and unity among our students.",
-    date: "2026-05-28",
-    category: "Campus Life",
-    image: "/images/assembly-prayer.png",
+    title: "Mid-Term Exam Schedule Released",
+    excerpt: "Exam dates and guidelines for Classes VI–XII are now available for parents and students.",
+    date: "2026-06-14",
+    category: "Notice",
+    image: "/images/assembly-hall.png",
   },
   {
     id: "3",
-    title: "Inauguration & Special Ceremonies",
-    excerpt:
-      "Ribbon-cutting ceremonies mark proud milestones in our school's journey.",
-    date: "2026-05-15",
-    category: "Achievement",
+    title: "Admissions Open for 2026–27",
+    excerpt: "Applications are now being accepted for the new academic session. Limited seats available.",
+    date: "2026-06-01",
+    category: "Admission Update",
     image: "/images/ribbon-cutting.png",
   },
   {
     id: "4",
-    title: "Student Celebrations",
-    excerpt:
-      "Birthdays and school events filled with joy, laughter, and togetherness.",
-    date: "2026-04-22",
-    category: "Events",
+    title: "District Science Exhibition Winners",
+    excerpt: "SK Academy students secured top positions at the district-level science fair.",
+    date: "2026-05-15",
+    category: "Achievement",
+    image: "/images/school-event.png",
+  },
+  {
+    id: "5",
+    title: "Summer Vacation Announcement",
+    excerpt: "School will remain closed during the summer break. Reopening details will follow.",
+    date: "2026-05-20",
+    category: "Announcement",
     image: "/images/celebration-event.png",
+  },
+  {
+    id: "6",
+    title: "Morning Assembly Highlights",
+    excerpt: "Daily assembly continues to build discipline, values, and unity among our students.",
+    date: "2026-05-28",
+    category: "Event",
+    image: "/images/assembly-prayer.png",
   },
 ];
 
@@ -76,6 +88,14 @@ export const events = [
     time: "11:00 AM - 1:00 PM",
     location: "Seminar Hall",
     type: "Workshop",
+  },
+  {
+    id: "5",
+    title: "Inter-School Sports Meet",
+    date: "2026-08-20",
+    time: "8:00 AM onwards",
+    location: "Sports Ground",
+    type: "Sports",
   },
 ];
 

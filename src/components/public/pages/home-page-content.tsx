@@ -5,6 +5,7 @@ import { HeroCarousel } from "@/components/public/hero-carousel";
 import { HighlightsCarousel } from "@/components/public/highlights-carousel";
 import { SectionHeading } from "@/components/public/section-heading";
 import { StatCards } from "@/components/public/stat-cards";
+import { SchoolHighlights } from "@/components/public/school-highlights";
 import { ScrollReveal } from "@/components/public/motion/scroll-reveal";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -23,7 +24,7 @@ export function HomePageContent() {
     <>
       <HeroCarousel />
 
-      <section className="border-b bg-background py-14 sm:py-20">
+      <section className="border-b bg-background py-10 sm:py-12">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <ScrollReveal>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl ring-1 ring-foreground/5">
@@ -53,13 +54,15 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="border-b bg-muted/40 py-14 sm:py-16">
+      <section className="border-b bg-muted/40 py-10 sm:py-12">
         <StatCards stats={stats} />
       </section>
 
+      <SchoolHighlights />
+
       <HighlightsCarousel />
 
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading title={homepage.whyChooseTitle} description={homepage.whyChooseDescription} centered className="mb-12" />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -83,7 +86,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="bg-primary py-16 text-primary-foreground sm:py-20">
+      <section className="bg-primary py-10 text-primary-foreground sm:py-12">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <ScrollReveal>
             <div className="relative mx-auto aspect-[4/5] w-full max-w-[280px] overflow-hidden rounded-2xl shadow-xl ring-2 ring-accent/40">
@@ -110,7 +113,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading title={homepage.facilitiesTitle} centered className="mb-12" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -128,7 +131,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="bg-muted/40 py-16 sm:py-20">
+      <section className="bg-muted/40 py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading title={homepage.achievementsTitle} centered className="mb-12" />
           <div className="grid gap-6 sm:grid-cols-2">
@@ -149,7 +152,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading title={homepage.testimonialsTitle} centered className="mb-12" />
           <div className="grid gap-6 md:grid-cols-3">
@@ -167,7 +170,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="bg-muted/40 py-16 sm:py-20">
+      <section className="bg-muted/40 py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading title={homepage.newsSectionTitle} description={homepage.newsSectionDescription} />
@@ -197,7 +200,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading title={homepage.eventsSectionTitle} description={homepage.eventsSectionDescription} centered className="mb-10" />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -223,7 +226,7 @@ export function HomePageContent() {
         </div>
       </section>
 
-      <section className="bg-primary py-16 text-primary-foreground">
+      <section className="bg-primary py-10 text-primary-foreground">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold">{homepage.ctaTitle}</h2>
           <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">{homepage.ctaDescription}</p>

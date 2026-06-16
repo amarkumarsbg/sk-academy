@@ -79,9 +79,6 @@ export function AdmissionInquiryForm() {
           <Button type="submit" className="w-full">
             Submit Inquiry
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            Demo form — submissions will be saved when backend is connected.
-          </p>
         </form>
       </CardContent>
     </Card>

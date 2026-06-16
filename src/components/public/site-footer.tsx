@@ -21,7 +21,7 @@ const FooterMap = dynamic(
 
 export function SiteFooter() {
   const { content } = useSiteContent();
-  const { settings, footer } = content;
+  const { settings, footer, contact } = content;
 
   const quickLinks = publicNav.filter((item) => item.href !== "/");
   const socialLinks = [
@@ -83,9 +83,9 @@ export function SiteFooter() {
               <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               {settings.email}
             </li>
-            {footer.schoolTimings?.map((line) => (
+            {contact.officeHours.map((line) => (
               <li key={line} className="flex gap-2">
-                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />
                 {line}
               </li>
             ))}
@@ -137,7 +137,7 @@ export function SiteFooter() {
 
       <div className="relative overflow-hidden border-t border-white/10">
         <div className="relative h-32 opacity-30">
-          <ContentImage src={footer.backgroundImage} alt="" fill className="object-cover" sizes="100vw" />
+          <ContentImage src={footer.backgroundImage} alt="SK Academy campus" fill className="object-cover" sizes="100vw" />
         </div>
       </div>
 

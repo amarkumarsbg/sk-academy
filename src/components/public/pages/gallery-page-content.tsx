@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { ContentImage } from "@/components/public/content-image";
 import { PageHero } from "@/components/public/page-hero";
+import { PageSection } from "@/components/public/page-section";
+import { PageCta } from "@/components/public/page-cta";
 import { SectionHeading } from "@/components/public/section-heading";
 import {
   Dialog,
@@ -15,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/context/site-content-provider";
 import type { GalleryAlbum } from "@/types/site-content";
+import { motion, AnimatePresence } from "motion/react";
 
 function albumPhotos(album: GalleryAlbum) {
   return album.photos?.length ? album.photos : [album.cover];
@@ -88,14 +91,13 @@ export function GalleryPageContent() {
   return (
     <>
       <PageHero title={pageHeroes.gallery.title} description={pageHeroes.gallery.description} />
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            title="Albums"
-            description="Browse photos by category. Click any album to preview."
-            centered
-            className="mb-8"
-          />
+      <PageSection>
+        <SectionHeading
+          title="Albums"
+          description="Browse photos by category. Click any album to preview."
+          centered
+          className="mb-6"
+        />
           <div className="mb-8 flex flex-wrap justify-center gap-2">
             {GALLERY_CATEGORIES.map((category) => (
               <Button
@@ -141,21 +143,32 @@ export function GalleryPageContent() {
               </button>
             ))}
           </div>
-        </div>
-      </section>
+      </PageSection>
+      <PageCta title="Experience SK Academy" description="Visit our campus and see our facilities in person." />
 
       <Dialog open={viewer !== null} onOpenChange={(open) => !open && closeViewer()}>
         <DialogContent className="max-w-5xl gap-0 overflow-hidden p-0 sm:max-w-5xl" showCloseButton>
           {activeAlbum && activePhoto && viewer && (
             <>
               <div className="relative aspect-[16/10] w-full bg-black sm:aspect-[16/9]">
-                <ContentImage
-                  src={activePhoto}
-                  alt={activeAlbum.title}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 1024px"
-                />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activePhoto}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute inset-0"
+                  >
+                    <ContentImage
+                      src={activePhoto}
+                      alt={`${activeAlbum.title} — photo ${viewer.photoIndex + 1}`}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 1024px) 100vw, 1024px"
+                    />
+                  </motion.div>
+                </AnimatePresence>
                 {photos.length > 1 && (
                   <>
                     <Button
@@ -203,7 +216,12 @@ export function GalleryPageContent() {
                             : "border-transparent opacity-70 hover:opacity-100"
                         }`}
                       >
-                        <ContentImage src={photo} alt="" fill className="object-cover" />
+                        <ContentImage
+                          src={photo}
+                          alt={`${activeAlbum.title} thumbnail ${photoIndex + 1}`}
+                          fill
+                          className="object-cover"
+                        />
                       </button>
                     ))}
                   </div>

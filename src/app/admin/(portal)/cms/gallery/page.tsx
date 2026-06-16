@@ -37,7 +37,7 @@ export default function CmsGalleryPage() {
             <ImageUploadField label="Cover image" value={album.cover} onChange={(v) => setGallery(gallery.map((a) => (a.id === album.id ? { ...a, cover: v } : a)))} />
           </ListItemCard>
         ))}
-        <AddItemButton label="Add Album" onClick={() => setGallery([...gallery, { id: createId(), title: "New Album", count: 0, cover: "/logo.png" }])} />
+        <AddItemButton label="Add Album" onClick={() => setGallery([...gallery, { id: createId(), title: "New Album", count: 0, cover: "/logo.png", category: "Events" }])} />
       </SectionCard>
     </CmsPageShell>
   );

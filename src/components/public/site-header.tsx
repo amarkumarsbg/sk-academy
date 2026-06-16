@@ -20,7 +20,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <SchoolLogo size="md" showName priority />
+        <div className="hidden min-w-0 sm:block">
+          <SchoolLogo size="md" showName showLocation={false} priority />
+        </div>
+        <div className="sm:hidden">
+          <SchoolLogo size="sm" priority />
+        </div>
 
         <nav className="hidden items-center gap-0.5 xl:flex">
           {publicNav.map((item) => (
@@ -74,6 +79,9 @@ export function SiteHeader() {
                   </Link>
                 ))}
               </nav>
+              <ButtonLink href="/admissions" className="mt-6 w-full" onClick={() => setOpen(false)}>
+                Apply Now
+              </ButtonLink>
             </SheetContent>
           </Sheet>
         </div>

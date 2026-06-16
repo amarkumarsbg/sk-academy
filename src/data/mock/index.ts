@@ -1,8 +1,8 @@
 export const stats = [
-  { label: "Students Enrolled", value: "2,450+" },
-  { label: "Expert Teachers", value: "120+" },
-  { label: "Years of Excellence", value: "16+" },
-  { label: "Success Rate", value: "98%" },
+  { label: "Students Enrolled", value: "2,450+", icon: "students" as const },
+  { label: "Expert Teachers", value: "120+", icon: "teachers" as const },
+  { label: "Years of Excellence", value: "16+", icon: "years" as const },
+  { label: "Success Rate", value: "98%", icon: "success" as const },
 ];
 
 export const newsItems = [
@@ -86,6 +86,7 @@ export const galleryAlbums = [
     count: 3,
     cover: "/images/annual-function.png",
     photos: ["/images/annual-function.png", "/images/staff-group.png", "/images/school-event.png"],
+    category: "Annual Function" as const,
   },
   {
     id: "2",
@@ -93,6 +94,7 @@ export const galleryAlbums = [
     count: 2,
     cover: "/images/assembly-prayer.png",
     photos: ["/images/assembly-prayer.png", "/images/assembly-hall.png"],
+    category: "Campus Life" as const,
   },
   {
     id: "3",
@@ -105,6 +107,7 @@ export const galleryAlbums = [
       "/images/celebration-event.png",
       "/images/school-event.png",
     ],
+    category: "Events" as const,
   },
   {
     id: "4",
@@ -112,6 +115,7 @@ export const galleryAlbums = [
     count: 1,
     cover: "/images/ribbon-cutting.png",
     photos: ["/images/ribbon-cutting.png"],
+    category: "Achievements" as const,
   },
   {
     id: "5",
@@ -119,6 +123,7 @@ export const galleryAlbums = [
     count: 2,
     cover: "/images/staff-group.png",
     photos: ["/images/staff-group.png", "/images/annual-function.png"],
+    category: "Events" as const,
   },
   {
     id: "6",
@@ -126,6 +131,7 @@ export const galleryAlbums = [
     count: 2,
     cover: "/images/assembly-hall.png",
     photos: ["/images/assembly-hall.png", "/images/assembly-prayer.png"],
+    category: "Campus Life" as const,
   },
 ];
 

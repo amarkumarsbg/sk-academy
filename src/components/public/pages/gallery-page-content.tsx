@@ -20,13 +20,20 @@ function albumPhotos(album: GalleryAlbum) {
   return album.photos?.length ? album.photos : [album.cover];
 }
 
+const GALLERY_CATEGORIES = ["All", "Events", "Sports", "Campus Life", "Annual Function", "Achievements"] as const;
+
 export function GalleryPageContent() {
   const { content } = useSiteContent();
   const { gallery, pageHeroes } = content;
+  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [viewer, setViewer] = useState<{ albumIndex: number; photoIndex: number } | null>(null);
 
-  const openAlbum = (albumIndex: number) => {
-    setViewer({ albumIndex, photoIndex: 0 });
+  const filteredGallery =
+    activeCategory === "All" ? gallery : gallery.filter((album) => album.category === activeCategory);
+
+  const openAlbum = (albumId: string) => {
+    const albumIndex = gallery.findIndex((album) => album.id === albumId);
+    if (albumIndex >= 0) setViewer({ albumIndex, photoIndex: 0 });
   };
 
   const closeViewer = () => setViewer(null);
@@ -85,17 +92,30 @@ export function GalleryPageContent() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
             title="Albums"
-            description="Click an album to view photos."
+            description="Browse photos by category. Click any album to preview."
             centered
-            className="mb-10"
+            className="mb-8"
           />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {gallery.map((album, index) => (
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
+            {GALLERY_CATEGORIES.map((category) => (
+              <Button
+                key={category}
+                type="button"
+                size="sm"
+                variant={activeCategory === category ? "default" : "outline"}
+                onClick={() => setActiveCategory(category)}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+          <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
+            {filteredGallery.map((album) => (
               <button
                 key={album.id}
                 type="button"
-                onClick={() => openAlbum(index)}
-                className="group relative overflow-hidden rounded-xl text-left shadow-md transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                onClick={() => openAlbum(album.id)}
+                className="group mb-4 block w-full break-inside-avoid overflow-hidden rounded-2xl text-left shadow-md ring-1 ring-foreground/5 transition hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <div className="relative aspect-[4/3]">
                   <ContentImage
@@ -109,6 +129,9 @@ export function GalleryPageContent() {
                     <ZoomIn className="h-4 w-4" />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <span className="mb-1 inline-block rounded-full bg-accent/90 px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
+                      {album.category}
+                    </span>
                     <h3 className="font-semibold">{album.title}</h3>
                     <p className="text-sm text-white/80">
                       {albumPhotos(album).length} photo{albumPhotos(album).length === 1 ? "" : "s"}

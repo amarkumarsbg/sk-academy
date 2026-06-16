@@ -8,6 +8,7 @@ export const siteConfig = {
   email: "info@skacademy.edu",
   admissionsEmail: "admissions@skacademy.edu",
   phone: "+91 98765 43210",
+  whatsapp: "+919876543210",
   address: "SK Academy, Kahalgaon, Bhagalpur, Bihar, India",
   logo: "/logo.png?v=2",
   social: {

@@ -10,6 +10,7 @@ import {
   admissionsSteps,
   notices,
 } from "@/data/mock/index";
+import { schoolMapEmbedUrl } from "@/lib/school-map";
 
 export const defaultSiteContent: SiteContent = {
   settings: {
@@ -22,6 +23,7 @@ export const defaultSiteContent: SiteContent = {
     email: "info@skacademy.edu",
     admissionsEmail: "admissions@skacademy.edu",
     phone: "+91 98765 43210",
+    whatsapp: "+919876543210",
     address: "SK Academy, Kahalgaon, Bhagalpur, Bihar, India",
     logo: "/logo.png?v=2",
     academicSession: "2026–27",
@@ -46,6 +48,14 @@ export const defaultSiteContent: SiteContent = {
   },
   stats,
   homepage: {
+    welcomeTitle: "Welcome to SK Academy",
+    welcomeImage: "/images/assembly-hall.png",
+    achievements: [
+      "16+ Years of Excellence",
+      "2,450+ Students",
+      "120+ Teachers",
+      "98% Academic Success Rate",
+    ],
     introExtra:
       "From primary to senior secondary, we offer a comprehensive CBSE-aligned curriculum with modern infrastructure, dedicated faculty, and a nurturing environment.",
     whyChooseTitle: "Why Choose SK Academy?",
@@ -63,7 +73,45 @@ export const defaultSiteContent: SiteContent = {
     eventsSectionDescription: "Mark your calendar for these important dates.",
     ctaTitle: "Ready to Join SK Academy?",
     ctaDescription: "Admissions are open for the academic year 2026–27. Start your journey with us today.",
-    ctaButton: "Start Application",
+    ctaButton: "Apply Now",
+    principalName: "Anita Prasad",
+    principalTitle: "Principal, SK Academy",
+    principalImage: "/images/principal.png",
+    principalMessage:
+      "At SK Academy, we believe every child carries unique potential. Our mission is to nurture curiosity, character, and confidence — preparing students not just for exams, but for life. We invite you to be part of our growing family.",
+    facilitiesTitle: "School Facilities",
+    facilities: [
+      { title: "Smart Classrooms", description: "Digital boards and interactive learning tools in every classroom." },
+      { title: "Computer Lab", description: "Modern systems with high-speed internet for hands-on learning." },
+      { title: "Library", description: "A rich collection of books, journals, and reading spaces." },
+      { title: "Transportation", description: "Safe, GPS-enabled buses covering Kahalgaon and nearby areas." },
+      { title: "Sports Facilities", description: "Grounds and equipment for cricket, football, athletics, and more." },
+    ],
+    achievementsTitle: "Student Achievements",
+    studentAchievements: [
+      { title: "100% Board Results", description: "Consistent pass rate with top district ranks in Class X & XII." },
+      { title: "Science Exhibition Winners", description: "Students awarded at district-level science fairs." },
+      { title: "Sports Champions", description: "Inter-school trophies in cricket, athletics, and kabaddi." },
+      { title: "Cultural Excellence", description: "Annual function and debate competition accolades." },
+    ],
+    testimonialsTitle: "What Parents Say",
+    testimonials: [
+      {
+        name: "Mrs. Meena Patel",
+        role: "Parent of Class X student",
+        quote: "SK Academy has transformed my child's confidence and academic performance. The teachers truly care.",
+      },
+      {
+        name: "Mr. Rajesh Kumar",
+        role: "Parent of Class VI student",
+        quote: "The campus, discipline, and values here are exactly what we wanted for our daughter.",
+      },
+      {
+        name: "Mrs. Sunita Verma",
+        role: "Parent of Class XII student",
+        quote: "Excellent board exam preparation and personal attention from faculty. Highly recommended.",
+      },
+    ],
   },
   news: newsItems,
   events,
@@ -89,7 +137,7 @@ export const defaultSiteContent: SiteContent = {
       { title: "Innovation", description: "Embracing new ideas and modern teaching methods." },
     ],
     leadership: [
-      { name: "Dr. R.K. Sharma", role: "Principal", bio: "Ph.D. in Education, 25+ years of leadership experience." },
+      { name: "Anita Prasad", role: "Principal", bio: "Ph.D. in Education, 25+ years of leadership experience." },
       { name: "Mrs. Poonam Agarwal", role: "Vice Principal", bio: "M.Ed., specialist in curriculum development." },
       { name: "Mr. Sanjay Mehra", role: "Academic Director", bio: "Former CBSE examiner, 20+ years in academics." },
     ],
@@ -140,6 +188,13 @@ export const defaultSiteContent: SiteContent = {
   },
   footer: {
     backgroundImage: "/images/assembly-hall.png",
+    schoolTimings: [
+      "Monday – Friday: 7:30 AM – 2:30 PM",
+      "Saturday: 8:00 AM – 12:00 PM (Office & Admissions)",
+      "Sunday & Holidays: Closed",
+    ],
+    brochureUrl: "/admissions#brochure",
+    mapEmbedUrl: schoolMapEmbedUrl,
   },
   pageHeroes: {
     events: {
@@ -159,4 +214,4 @@ export const defaultSiteContent: SiteContent = {
 
 export const STORAGE_KEY = "sk-academy-site-content";
 export const CONTENT_VERSION_KEY = "sk-academy-content-version";
-export const CONTENT_VERSION = 2;
+export const CONTENT_VERSION = 4;

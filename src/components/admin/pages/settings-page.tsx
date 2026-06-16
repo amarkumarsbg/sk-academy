@@ -54,6 +54,7 @@ export function SettingsPageContent() {
             <Field label="Email" value={settings.email} onChange={(v) => setSettings({ ...settings, email: v })} />
             <Field label="Admissions Email" value={settings.admissionsEmail} onChange={(v) => setSettings({ ...settings, admissionsEmail: v })} />
             <Field label="Phone" value={settings.phone} onChange={(v) => setSettings({ ...settings, phone: v })} />
+            <Field label="WhatsApp Number" value={settings.whatsapp} onChange={(v) => setSettings({ ...settings, whatsapp: v })} />
             <Field label="Address" value={settings.address} onChange={(v) => setSettings({ ...settings, address: v })} />
           </SectionCard>
 

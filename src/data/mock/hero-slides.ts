@@ -2,10 +2,12 @@ export const heroSlides = [
   {
     id: "1",
     image: "/images/assembly-prayer.png",
-    title: "Nurturing Tomorrow's Leaders",
-    subtitle: "Quality education in Kahalgaon, Bhagalpur since 2010.",
-    cta: "Apply for Admission",
+    title: "Shaping Future Leaders Since 2010",
+    subtitle: "CBSE Curriculum • Smart Classrooms • Experienced Faculty",
+    cta: "Apply Now",
     ctaHref: "/admissions",
+    secondaryCta: "Download Brochure",
+    secondaryCtaHref: "/admissions#brochure",
   },
   {
     id: "2",
@@ -14,6 +16,8 @@ export const heroSlides = [
     subtitle: "Celebrating talent, tradition, and togetherness at SK Academy.",
     cta: "View Events",
     ctaHref: "/events",
+    secondaryCta: "View Gallery",
+    secondaryCtaHref: "/gallery",
   },
   {
     id: "3",
@@ -22,6 +26,8 @@ export const heroSlides = [
     subtitle: "New milestones, celebrations, and achievements every year.",
     cta: "About Us",
     ctaHref: "/about",
+    secondaryCta: "Apply Now",
+    secondaryCtaHref: "/admissions",
   },
   {
     id: "4",
@@ -30,5 +36,7 @@ export const heroSlides = [
     subtitle: "Join SK Academy — where every child learns, grows, and excels.",
     cta: "Contact Us",
     ctaHref: "/contact",
+    secondaryCta: "Download Brochure",
+    secondaryCtaHref: "/admissions#brochure",
   },
 ];

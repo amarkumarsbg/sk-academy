@@ -7,6 +7,7 @@ export interface SiteSettings {
   email: string;
   admissionsEmail: string;
   phone: string;
+  whatsapp: string;
   address: string;
   logo: string;
   academicSession: string;
@@ -31,6 +32,8 @@ export interface HeroSlide {
   subtitle: string;
   cta: string;
   ctaHref: string;
+  secondaryCta?: string;
+  secondaryCtaHref?: string;
 }
 
 export interface HighlightItem {
@@ -43,6 +46,7 @@ export interface HighlightItem {
 export interface StatItem {
   label: string;
   value: string;
+  icon?: "students" | "teachers" | "years" | "success";
 }
 
 export interface FeatureItem {
@@ -51,6 +55,9 @@ export interface FeatureItem {
 }
 
 export interface HomepageContent {
+  welcomeTitle: string;
+  welcomeImage: string;
+  achievements: string[];
   introExtra: string;
   whyChooseTitle: string;
   whyChooseDescription: string;
@@ -62,6 +69,16 @@ export interface HomepageContent {
   ctaTitle: string;
   ctaDescription: string;
   ctaButton: string;
+  principalName: string;
+  principalTitle: string;
+  principalMessage: string;
+  principalImage: string;
+  facilitiesTitle: string;
+  facilities: FeatureItem[];
+  achievementsTitle: string;
+  studentAchievements: FeatureItem[];
+  testimonialsTitle: string;
+  testimonials: { name: string; role: string; quote: string }[];
 }
 
 export interface PageHeroContent {
@@ -101,6 +118,7 @@ export interface GalleryAlbum {
   count: number;
   cover: string;
   photos?: string[];
+  category: "Events" | "Sports" | "Campus Life" | "Annual Function" | "Achievements";
 }
 
 export interface AcademicLevel {
@@ -155,6 +173,9 @@ export interface ContactContent {
 
 export interface FooterContent {
   backgroundImage: string;
+  schoolTimings: string[];
+  brochureUrl: string;
+  mapEmbedUrl: string;
 }
 
 export interface HighlightsSection {

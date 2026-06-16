@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ContentImage } from "@/components/public/content-image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ButtonLink } from "@/components/ui/button-link";
+import { AnimatePresence, motion } from "motion/react";
 import { useSiteContent } from "@/context/site-content-provider";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,8 @@ export function HeroCarousel() {
 
   if (heroSlides.length === 0) return null;
 
+  const slide = heroSlides[active];
+
   return (
     <section
       className="relative h-[420px] w-full overflow-hidden sm:h-[500px] lg:h-[580px]"
@@ -51,41 +53,44 @@ export function HeroCarousel() {
           )}
           aria-hidden={index !== active}
         >
-          <div className="relative h-full w-full">
-            <ContentImage
-              src={slide.image}
-              alt={slide.title}
-              fill
-              priority={index === 0}
-              className="object-cover"
-              sizes="100vw"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/55 to-primary/20" />
-
-          <div className="relative z-10 flex h-full items-center">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="max-w-xl text-primary-foreground">
-                <p className="mb-3 text-sm font-medium uppercase tracking-widest text-white/80">
-                  {content.settings.name} · {index + 1} / {heroSlides.length}
-                </p>
-                <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-                  {slide.title}
-                </h1>
-                <p className="mt-4 text-base text-white/90 sm:text-lg">{slide.subtitle}</p>
-                <ButtonLink
-                  href={slide.ctaHref}
-                  size="lg"
-                  variant="secondary"
-                  className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  {slide.cta}
-                </ButtonLink>
-              </div>
-            </div>
-          </div>
+          <ContentImage
+            src={slide.image}
+            alt={slide.title}
+            fill
+            priority={index === 0}
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
         </div>
       ))}
+
+      <div className="absolute inset-x-0 bottom-0 z-10 pb-14 pt-8">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={slide.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-2xl"
+            >
+              <h1 className="text-2xl font-bold leading-tight text-white drop-shadow-md sm:text-3xl lg:text-4xl">
+                {slide.title}
+              </h1>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.08 }}
+                className="mt-2 text-sm leading-relaxed text-white/95 drop-shadow sm:text-base"
+              >
+                {slide.subtitle}
+              </motion.p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
 
       <button
         type="button"

@@ -29,6 +29,8 @@ export default function CmsHomepagePage() {
             <Field label="Subtitle" value={slide.subtitle} onChange={(v) => setSlides(slides.map((s) => (s.id === slide.id ? { ...s, subtitle: v } : s)))} />
             <Field label="Button Text" value={slide.cta} onChange={(v) => setSlides(slides.map((s) => (s.id === slide.id ? { ...s, cta: v } : s)))} />
             <Field label="Button Link" value={slide.ctaHref} onChange={(v) => setSlides(slides.map((s) => (s.id === slide.id ? { ...s, ctaHref: v } : s)))} />
+            <Field label="Secondary Button Text" value={slide.secondaryCta ?? ""} onChange={(v) => setSlides(slides.map((s) => (s.id === slide.id ? { ...s, secondaryCta: v || undefined } : s)))} />
+            <Field label="Secondary Button Link" value={slide.secondaryCtaHref ?? ""} onChange={(v) => setSlides(slides.map((s) => (s.id === slide.id ? { ...s, secondaryCtaHref: v || undefined } : s)))} />
           </ListItemCard>
         ))}
         <AddItemButton label="Add Slide" onClick={() => setSlides([...slides, { id: createId(), image: "/logo.png", title: "New Slide", subtitle: "", cta: "Learn More", ctaHref: "/" }])} />
@@ -65,6 +67,17 @@ export default function CmsHomepagePage() {
         <Field label="News Description" value={homepage.newsSectionDescription} onChange={(v) => setHomepage({ ...homepage, newsSectionDescription: v })} />
         <Field label="Events Title" value={homepage.eventsSectionTitle} onChange={(v) => setHomepage({ ...homepage, eventsSectionTitle: v })} />
         <Field label="Events Description" value={homepage.eventsSectionDescription} onChange={(v) => setHomepage({ ...homepage, eventsSectionDescription: v })} />
+      </SectionCard>
+
+      <SectionCard title="Principal's Message">
+        <ImageUploadField
+          label="Principal Photo"
+          value={homepage.principalImage}
+          onChange={(v) => setHomepage({ ...homepage, principalImage: v })}
+        />
+        <Field label="Name" value={homepage.principalName} onChange={(v) => setHomepage({ ...homepage, principalName: v })} />
+        <Field label="Title" value={homepage.principalTitle} onChange={(v) => setHomepage({ ...homepage, principalTitle: v })} />
+        <TextAreaField label="Message" value={homepage.principalMessage} onChange={(v) => setHomepage({ ...homepage, principalMessage: v })} />
       </SectionCard>
 
       <SectionCard title="Call to Action">

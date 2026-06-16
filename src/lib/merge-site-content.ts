@@ -1,4 +1,5 @@
 import { defaultSiteContent } from "@/data/default-content";
+import { normalizeMapEmbedUrl } from "@/lib/school-map";
 import type { SiteContent } from "@/types/site-content";
 
 const OFFICIAL_LOGO = "/logo.png?v=2";
@@ -55,7 +56,11 @@ export function mergeStoredSiteContent(stored: Partial<SiteContent>): SiteConten
     academics: { ...defaultSiteContent.academics, ...stored.academics },
     admissions: { ...defaultSiteContent.admissions, ...stored.admissions },
     contact: { ...defaultSiteContent.contact, ...stored.contact },
-    footer: { ...defaultSiteContent.footer, ...stored.footer },
+    footer: {
+      ...defaultSiteContent.footer,
+      ...stored.footer,
+      mapEmbedUrl: normalizeMapEmbedUrl(stored.footer?.mapEmbedUrl),
+    },
     pageHeroes: { ...defaultSiteContent.pageHeroes, ...stored.pageHeroes },
     heroSlides: stored.heroSlides ?? defaultSiteContent.heroSlides,
     highlights: stored.highlights ?? defaultSiteContent.highlights,

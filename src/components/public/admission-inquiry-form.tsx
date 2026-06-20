@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { submitAdmissionInquiry } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
+import { AdminButtonSpinner } from "@/components/admin/admin-loading";
+import { TurnstileWidget } from "@/components/public/turnstile-widget";
 
 export function AdmissionInquiryForm() {
   const { content } = useSiteContent();
@@ -23,8 +25,10 @@ export function AdmissionInquiryForm() {
   const [error, setError] = useState("");
   const [studentName, setStudentName] = useState("");
   const [parentName, setParentName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [grade, setGrade] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -35,8 +39,9 @@ export function AdmissionInquiryForm() {
       await submitAdmissionInquiry({
         name: `${studentName} (Parent: ${parentName})`,
         phone,
-        email: "inquiry@skacademy.local",
+        email: email || content.settings.admissionsEmail,
         grade,
+        captchaToken: captchaToken ?? undefined,
       });
       setSubmitted(true);
     } catch (err) {
@@ -71,34 +76,19 @@ export function AdmissionInquiryForm() {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="student-name">Student Name</Label>
-            <Input
-              id="student-name"
-              required
-              placeholder="Enter student name"
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-            />
+            <Input id="student-name" required placeholder="Enter student name" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="parent-name">Parent Name</Label>
-            <Input
-              id="parent-name"
-              required
-              placeholder="Enter parent name"
-              value={parentName}
-              onChange={(e) => setParentName(e.target.value)}
-            />
+            <Input id="parent-name" required placeholder="Enter parent name" value={parentName} onChange={(e) => setParentName(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="inquiry-email">Email</Label>
+            <Input id="inquiry-email" type="email" required placeholder="parent@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="mobile">Mobile Number</Label>
-            <Input
-              id="mobile"
-              type="tel"
-              required
-              placeholder="+91 98765 43210"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
+            <Input id="mobile" type="tel" required placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>Class Applying For</Label>
@@ -107,19 +97,18 @@ export function AdmissionInquiryForm() {
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
               <SelectContent>
-                {["Nursery", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"].map(
-                  (cls) => (
-                    <SelectItem key={cls} value={cls}>
-                      Class {cls}
-                    </SelectItem>
-                  )
-                )}
+                {["Nursery", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"].map((cls) => (
+                  <SelectItem key={cls} value={cls}>
+                    Class {cls}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
+          <TurnstileWidget onToken={setCaptchaToken} />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Submitting..." : "Submit Inquiry"}
+            {submitting ? <AdminButtonSpinner label="Submitting..." /> : "Submit Inquiry"}
           </Button>
         </form>
       </CardContent>

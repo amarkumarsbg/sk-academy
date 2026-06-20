@@ -86,6 +86,11 @@ export default function AdminLoginForm() {
             Default: admin@skacademy.edu / admin1234 (after running seed)
           </p>
           <div className="mt-4 text-center">
+            <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+          <div className="mt-2 text-center">
             <Link href="/" className="text-sm text-primary hover:underline">
               ← Back to website
             </Link>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDay, formatMonthShort, formatYear } from "@/lib/format-date";
@@ -20,6 +21,7 @@ type EventCardProps = {
 
 export function EventCard({ event, className }: EventCardProps) {
   return (
+    <Link href={`/events/${event.id}`} className="block h-full">
     <Card className={cn("card-interactive h-full", className)}>
       <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center">
         <div
@@ -49,5 +51,6 @@ export function EventCard({ event, className }: EventCardProps) {
         <Calendar className="hidden h-8 w-8 shrink-0 text-primary/20 sm:block" aria-hidden />
       </CardContent>
     </Card>
+    </Link>
   );
 }

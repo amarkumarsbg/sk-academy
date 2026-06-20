@@ -15,10 +15,13 @@ import {
   GraduationCap,
   Home,
   IndianRupee,
+  Inbox,
   LayoutDashboard,
   LogOut,
   Menu,
+  ScrollText,
   Settings,
+  UserCog,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -57,7 +60,10 @@ const iconMap: Record<string, LucideIcon> = {
   Bell,
   Calendar,
   Globe,
+  Inbox,
+  ScrollText,
   Settings,
+  UserCog,
 };
 
 export function AdminSidebar() {

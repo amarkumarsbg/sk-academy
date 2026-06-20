@@ -5,7 +5,6 @@ import { SiteContentProvider } from "@/context/site-content-provider";
 import { defaultSiteContent } from "@/data/default-content";
 import { fetchSiteContent } from "@/lib/api";
 import { mergeStoredSiteContent } from "@/lib/merge-site-content";
-import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -15,30 +14,44 @@ const poppins = Poppins({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  openGraph: {
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-    type: "website",
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
-  },
-  icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    shortcut: [{ url: "/logo.png", type: "image/png" }],
-    apple: [{ url: "/logo.png", type: "image/png" }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let content = defaultSiteContent;
+  try {
+    content = mergeStoredSiteContent(await fetchSiteContent());
+  } catch {
+    // use defaults during build/offline
+  }
+
+  const { settings } = content;
+  const title = settings.seo?.metaTitle || settings.name;
+  const description = settings.seo?.metaDescription || settings.description;
+
+  return {
+    title: {
+      default: title,
+      template: `%s | ${settings.name}`,
+    },
+    description,
+    keywords: settings.seo?.metaKeywords,
+    openGraph: {
+      title,
+      description,
+      siteName: settings.name,
+      type: "website",
+      locale: "en_IN",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+    icons: {
+      icon: [{ url: settings.logo || "/logo.png", type: "image/png" }],
+      shortcut: [{ url: settings.logo || "/logo.png", type: "image/png" }],
+      apple: [{ url: settings.logo || "/logo.png", type: "image/png" }],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

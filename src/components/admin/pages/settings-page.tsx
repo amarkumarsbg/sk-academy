@@ -7,9 +7,11 @@ import { AdminHeader } from "@/components/admin/admin-shell";
 import { CmsStickyFooter, Field, ImageUploadField, SectionCard, TextAreaField } from "@/components/admin/cms-form-fields";
 import { markCmsSectionSaved, useCmsToast } from "@/components/admin/cms-toast";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSiteContent } from "@/context/site-content-provider";
+import { uploadDocument } from "@/lib/api";
 import { useCmsPageDraft } from "@/hooks/use-cms-draft";
+import { useSiteContent } from "@/context/site-content-provider";
 import type { AnnouncementContent, SiteSettings } from "@/types/site-content";
 
 const tabItems = [
@@ -27,11 +29,14 @@ export function SettingsPageContent() {
   const [settings, setSettings] = useState<SiteSettings>(content.settings);
   const [announcement, setAnnouncement] = useState<AnnouncementContent>(content.announcement);
   const [footerImage, setFooterImage] = useState(content.footer.backgroundImage);
+  const [brochureUrl, setBrochureUrl] = useState(content.footer.brochureUrl);
+  const [brochureUploading, setBrochureUploading] = useState(false);
 
   useEffect(() => {
     setSettings(content.settings);
     setAnnouncement(content.announcement);
     setFooterImage(content.footer.backgroundImage);
+    setBrochureUrl(content.footer.brochureUrl);
   }, [content]);
 
   const savedSnapshot = useMemo(
@@ -39,17 +44,19 @@ export function SettingsPageContent() {
       settings: content.settings,
       announcement: content.announcement,
       footerImage: content.footer.backgroundImage,
+      brochureUrl: content.footer.brochureUrl,
     }),
     [content]
   );
   const draftSnapshot = useMemo(
-    () => ({ settings, announcement, footerImage }),
-    [settings, announcement, footerImage]
+    () => ({ settings, announcement, footerImage, brochureUrl }),
+    [settings, announcement, footerImage, brochureUrl]
   );
   const resetDraft = useCallback(() => {
     setSettings(content.settings);
     setAnnouncement(content.announcement);
     setFooterImage(content.footer.backgroundImage);
+    setBrochureUrl(content.footer.brochureUrl);
   }, [content]);
   const { isDirty, onCancel } = useCmsPageDraft(savedSnapshot, draftSnapshot, resetDraft);
 
@@ -58,7 +65,7 @@ export function SettingsPageContent() {
       ...prev,
       settings,
       announcement,
-      footer: { ...prev.footer, backgroundImage: footerImage },
+      footer: { ...prev.footer, backgroundImage: footerImage, brochureUrl },
     }));
     markCmsSectionSaved("cms-settings");
     showToast("Settings saved successfully");
@@ -105,8 +112,35 @@ export function SettingsPageContent() {
                   <Field label="Link Text" value={announcement.linkText} onChange={(v) => setAnnouncement({ ...announcement, linkText: v })} />
                   <Field label="Link URL" value={announcement.linkHref} onChange={(v) => setAnnouncement({ ...announcement, linkHref: v })} />
                 </SectionCard>
-                <SectionCard title="Footer">
+                <SectionCard title="Footer & Downloads">
                   <ImageUploadField label="Background image" value={footerImage} onChange={setFooterImage} />
+                  <Field label="Brochure URL" value={brochureUrl} onChange={setBrochureUrl} placeholder="https://... or upload PDF below" />
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Upload brochure PDF</Label>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      disabled={brochureUploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setBrochureUploading(true);
+                        try {
+                          setBrochureUrl(await uploadDocument(file));
+                        } finally {
+                          setBrochureUploading(false);
+                          e.target.value = "";
+                        }
+                      }}
+                      className="block w-full text-sm"
+                    />
+                    {brochureUploading && <p className="text-xs text-muted-foreground">Uploading brochure…</p>}
+                    {brochureUrl && (
+                      <a href={brochureUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                        View current brochure ↗
+                      </a>
+                    )}
+                  </div>
                 </SectionCard>
               </TabsContent>
 

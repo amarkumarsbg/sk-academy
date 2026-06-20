@@ -145,7 +145,13 @@ export function SiteFooter() {
         <p>
           Copyright © {new Date().getFullYear()} {settings.name}. All rights reserved.
           {" · "}
-          <Link href="/contact" className="hover:text-white">Privacy Policy</Link>
+          <Link href="/privacy" className="hover:text-white">
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link href="/terms" className="hover:text-white">
+            Terms
+          </Link>
         </p>
       </div>
     </footer>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ContentImage } from "@/components/public/content-image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ type NewsCardProps = {
 
 export function NewsCard({ item, className }: NewsCardProps) {
   return (
+    <Link href={`/news/${item.id}`} className="block h-full">
     <Card className={cn("card-interactive flex h-full flex-col overflow-hidden pt-0", className)}>
       <div className="relative aspect-[16/9]">
         <ContentImage
@@ -43,5 +45,6 @@ export function NewsCard({ item, className }: NewsCardProps) {
         <p className="text-sm leading-relaxed text-muted-foreground">{item.excerpt}</p>
       </CardContent>
     </Card>
+    </Link>
   );
 }

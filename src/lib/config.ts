@@ -39,7 +39,10 @@ export const adminNav = [
   { label: "Exams", href: "/admin/exams", icon: "FileText" },
   { label: "Results", href: "/admin/results", icon: "Award" },
   { label: "Notices", href: "/admin/notices", icon: "Bell" },
+  { label: "Inbox", href: "/admin/inbox", icon: "Inbox" },
   { label: "Events", href: "/admin/events", icon: "Calendar" },
   { label: "Website CMS", href: "/admin/cms", icon: "Globe" },
+  { label: "Staff Users", href: "/admin/users", icon: "UserCog" },
+  { label: "Audit Log", href: "/admin/audit-log", icon: "ScrollText" },
   { label: "Settings", href: "/admin/settings", icon: "Settings" },
 ];

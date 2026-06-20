@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { submitContact } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
+import { AdminButtonSpinner } from "@/components/admin/admin-loading";
+import { TurnstileWidget } from "@/components/public/turnstile-widget";
 
 type FormState = "idle" | "success" | "error";
 
@@ -46,6 +48,7 @@ export function ContactForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [state, setState] = useState<FormState>("idle");
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,7 +62,7 @@ export function ContactForm() {
 
     setSubmitting(true);
     try {
-      await submitContact(values);
+      await submitContact({ ...values, captchaToken: captchaToken ?? undefined });
       setState("success");
     } catch (err) {
       setErrors({
@@ -143,8 +146,10 @@ export function ContactForm() {
             </p>
           )}
 
+          <TurnstileWidget onToken={setCaptchaToken} />
+
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Sending..." : "Send Message"}
+            {submitting ? <AdminButtonSpinner label="Sending..." /> : "Send Message"}
           </Button>
         </form>
       </CardContent>

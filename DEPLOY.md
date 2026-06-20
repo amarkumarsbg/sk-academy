@@ -89,8 +89,10 @@ npm run seed
 | Name | Value |
 |------|-------|
 | `API_URL` | `https://sk-academy-api.onrender.com` |
+| `CLIENT_URL` | `https://your-app.vercel.app` (after deploy) |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | optional — Cloudflare Turnstile |
 
-No trailing slash. Apply to **Production**, **Preview**, and **Development**.
+No trailing slash on URLs. Apply to **Production**, **Preview**, and **Development**.
 
 5. Click **Deploy**.
 
@@ -115,7 +117,9 @@ CLIENT_URL=https://sk-academy.vercel.app
 - [ ] Admin login: `/admin/login`
 - [ ] Login with seeded admin credentials
 - [ ] CMS save works
-- [ ] Image upload works (note: free Render disk is ephemeral — see below)
+- [ ] Image upload works (Cloudinary recommended — see below)
+- [ ] Contact / admission forms appear in admin **Inbox**
+- [ ] Privacy & Terms pages load from footer links
 
 ---
 
@@ -125,6 +129,8 @@ CLIENT_URL=https://sk-academy.vercel.app
 
 ```env
 API_URL=https://sk-academy-api.onrender.com
+CLIENT_URL=https://your-app.vercel.app
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=   # optional
 ```
 
 ### Render (`server/`)
@@ -139,6 +145,22 @@ CLIENT_URL=https://your-app.vercel.app
 UPLOAD_DIR=uploads
 ADMIN_EMAIL=admin@skacademy.edu
 ADMIN_PASSWORD=your-secure-password
+
+# Optional — email + password reset
+NOTIFY_EMAIL=admissions@skacademy.edu
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+SMTP_FROM="SK Academy <noreply@skacademy.edu>"
+
+# Optional — CAPTCHA
+TURNSTILE_SECRET_KEY=
+
+# Recommended — persistent uploads
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ---
@@ -150,8 +172,22 @@ ADMIN_PASSWORD=your-secure-password
 - Upgrade to a paid plan for always-on production use.
 
 ### Image uploads
-- Uploads are stored on Render’s local disk and **may be lost on redeploy**.
-- For production, migrate to Cloudinary or S3 later.
+- Set **Cloudinary** env vars on Render for persistent uploads (recommended):
+  - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- Without Cloudinary, uploads use Render’s local disk and **may be lost on redeploy**.
+
+### Email notifications
+- Set SMTP vars on Render to receive email when someone submits contact or admission inquiry forms:
+  - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `NOTIFY_EMAIL`
+- Forms still save to the admin **Inbox** without SMTP.
+
+### CAPTCHA (optional)
+- Create keys at [Cloudflare Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile).
+- Render: `TURNSTILE_SECRET_KEY`
+- Vercel: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+
+### Password reset
+- Requires SMTP on Render. Staff can use **Forgot password** on `/admin/login`.
 
 ### Custom domain
 - Point your domain to Vercel.

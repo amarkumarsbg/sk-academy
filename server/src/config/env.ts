@@ -20,4 +20,23 @@ export const env = {
   adminEmail: process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",
   isProduction: process.env.NODE_ENV === "production",
+  notifyEmail: process.env.NOTIFY_EMAIL ?? process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPass: process.env.SMTP_PASS ?? "",
+  smtpFrom: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@skacademy.edu",
+  turnstileSecret: process.env.TURNSTILE_SECRET_KEY ?? "",
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY ?? "",
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
+  get emailEnabled() {
+    return Boolean(this.smtpHost && this.smtpUser && this.smtpPass);
+  },
+  get turnstileEnabled() {
+    return Boolean(this.turnstileSecret);
+  },
+  get cloudinaryEnabled() {
+    return Boolean(this.cloudinaryCloudName && this.cloudinaryApiKey && this.cloudinaryApiSecret);
+  },
 };

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
-import { EditorNote } from "@/components/admin/content-editor";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { useSiteContent } from "@/context/site-content-provider";
@@ -16,7 +15,6 @@ export default function AdminEventsPage() {
     <>
       <AdminHeader title="Events" />
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <EditorNote />
         <div className="mb-4 flex flex-wrap justify-end gap-2">
           <ButtonLink href="/admin/cms/events" size="sm">
             <Pencil className="mr-2 h-4 w-4" />

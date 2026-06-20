@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteContentProvider } from "@/context/site-content-provider";
+import { defaultSiteContent } from "@/data/default-content";
+import { fetchSiteContent } from "@/lib/api";
+import { mergeStoredSiteContent } from "@/lib/merge-site-content";
 import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
@@ -37,15 +40,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let initialContent = defaultSiteContent;
+
+  try {
+    initialContent = mergeStoredSiteContent(await fetchSiteContent());
+  } catch {
+    // API unavailable during build or before seed — use bundled defaults
+  }
+
   return (
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
-        <SiteContentProvider>
+        <SiteContentProvider initialContent={initialContent}>
           <TooltipProvider>{children}</TooltipProvider>
         </SiteContentProvider>
       </body>

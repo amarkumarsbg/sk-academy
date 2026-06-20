@@ -38,6 +38,16 @@ export const defaultSiteContent: SiteContent = {
       instagram: "https://instagram.com",
       youtube: "https://youtube.com",
     },
+    seo: {
+      metaTitle: "SK Academy — Learn • Grow • Excel",
+      metaDescription:
+        "SK Academy in Kahalgaon, Bhagalpur offers quality education from Nursery to Class XII.",
+      metaKeywords: "SK Academy, school, Kahalgaon, Bhagalpur, education",
+    },
+    theme: {
+      primaryColor: "#1e40af",
+      accentColor: "#f59e0b",
+    },
   },
   announcement: {
     message: "Admissions Open 2026-27",

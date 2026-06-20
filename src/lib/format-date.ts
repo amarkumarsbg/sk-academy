@@ -27,3 +27,12 @@ export function formatDateLong(dateStr: string) {
   const { year, month, day } = parseDateParts(dateStr);
   return `${day} ${MONTHS_LONG[month - 1]} ${year}`;
 }
+
+/** Sort ISO date strings (YYYY-MM-DD) newest first. */
+export function compareDateDesc(a: string, b: string) {
+  return b.localeCompare(a);
+}
+
+export function sortByDateDesc<T extends { date: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => compareDateDesc(a.date, b.date));
+}

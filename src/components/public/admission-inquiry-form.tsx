@@ -13,10 +13,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { submitAdmissionInquiry } from "@/lib/api";
+import { ApiError } from "@/lib/api/client";
 
 export function AdmissionInquiryForm() {
   const { content } = useSiteContent();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [studentName, setStudentName] = useState("");
+  const [parentName, setParentName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [grade, setGrade] = useState("");
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      await submitAdmissionInquiry({
+        name: `${studentName} (Parent: ${parentName})`,
+        phone,
+        email: "inquiry@skacademy.local",
+        grade,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to submit inquiry");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (submitted) {
     return (
@@ -40,28 +68,41 @@ export function AdmissionInquiryForm() {
         </p>
       </CardHeader>
       <CardContent>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSubmitted(true);
-          }}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="student-name">Student Name</Label>
-            <Input id="student-name" required placeholder="Enter student name" />
+            <Input
+              id="student-name"
+              required
+              placeholder="Enter student name"
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="parent-name">Parent Name</Label>
-            <Input id="parent-name" required placeholder="Enter parent name" />
+            <Input
+              id="parent-name"
+              required
+              placeholder="Enter parent name"
+              value={parentName}
+              onChange={(e) => setParentName(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="mobile">Mobile Number</Label>
-            <Input id="mobile" type="tel" required placeholder="+91 98765 43210" />
+            <Input
+              id="mobile"
+              type="tel"
+              required
+              placeholder="+91 98765 43210"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label>Class Applying For</Label>
-            <Select required>
+            <Select required value={grade} onValueChange={(v) => setGrade(v ?? "")}>
               <SelectTrigger>
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
@@ -76,8 +117,9 @@ export function AdmissionInquiryForm() {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="w-full">
-            Submit Inquiry
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Inquiry"}
           </Button>
         </form>
       </CardContent>

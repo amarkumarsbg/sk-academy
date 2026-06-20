@@ -13,6 +13,7 @@ export const newsItems = [
     date: "2026-06-10",
     category: "Event",
     image: "/images/annual-function.png",
+    status: "Published" as const,
   },
   {
     id: "2",
@@ -21,6 +22,7 @@ export const newsItems = [
     date: "2026-06-14",
     category: "Notice",
     image: "/images/assembly-hall.png",
+    status: "Published" as const,
   },
   {
     id: "3",
@@ -29,6 +31,7 @@ export const newsItems = [
     date: "2026-06-01",
     category: "Admission Update",
     image: "/images/ribbon-cutting.png",
+    status: "Published" as const,
   },
   {
     id: "4",
@@ -37,6 +40,7 @@ export const newsItems = [
     date: "2026-05-15",
     category: "Achievement",
     image: "/images/school-event.png",
+    status: "Published" as const,
   },
   {
     id: "5",
@@ -45,6 +49,7 @@ export const newsItems = [
     date: "2026-05-20",
     category: "Announcement",
     image: "/images/celebration-event.png",
+    status: "Published" as const,
   },
   {
     id: "6",
@@ -53,6 +58,7 @@ export const newsItems = [
     date: "2026-05-28",
     category: "Event",
     image: "/images/assembly-prayer.png",
+    status: "Published" as const,
   },
 ];
 

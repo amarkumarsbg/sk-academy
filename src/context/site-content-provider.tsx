@@ -9,60 +9,62 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { defaultSiteContent, STORAGE_KEY, CONTENT_VERSION_KEY, CONTENT_VERSION } from "@/data/default-content";
-import { mergeStoredSiteContent } from "@/lib/merge-site-content";
+import { defaultSiteContent } from "@/data/default-content";
+import { saveSiteContent } from "@/lib/api";
 import type { SiteContent } from "@/types/site-content";
 
 interface SiteContentContextValue {
   content: SiteContent;
   hydrated: boolean;
-  updateContent: (updater: (prev: SiteContent) => SiteContent) => void;
+  saving: boolean;
+  lastSavedAt: Date | null;
+  updateContent: (updater: (prev: SiteContent) => SiteContent) => Promise<void>;
   resetContent: () => void;
 }
 
 const SiteContentContext = createContext<SiteContentContextValue | null>(null);
 
-export function SiteContentProvider({ children }: { children: ReactNode }) {
-  const [content, setContent] = useState<SiteContent>(defaultSiteContent);
+export function SiteContentProvider({
+  children,
+  initialContent = defaultSiteContent,
+}: {
+  children: ReactNode;
+  initialContent?: SiteContent;
+}) {
+  const [content, setContent] = useState<SiteContent>(initialContent);
   const [hydrated, setHydrated] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   useEffect(() => {
-    try {
-      const storedVersion = localStorage.getItem(CONTENT_VERSION_KEY);
-      if (storedVersion !== String(CONTENT_VERSION)) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.setItem(CONTENT_VERSION_KEY, String(CONTENT_VERSION));
-      }
-
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setContent(mergeStoredSiteContent(JSON.parse(stored)));
-      } else {
-        setContent(defaultSiteContent);
-      }
-    } catch {
-      setContent(defaultSiteContent);
-    }
+    setContent(initialContent);
     setHydrated(true);
-  }, []);
+  }, [initialContent]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-  }, [content, hydrated]);
+  const updateContent = useCallback(async (updater: (prev: SiteContent) => SiteContent) => {
+    let nextContent!: SiteContent;
+    setContent((prev) => {
+      nextContent = updater(prev);
+      return nextContent;
+    });
 
-  const updateContent = useCallback((updater: (prev: SiteContent) => SiteContent) => {
-    setContent((prev) => updater(prev));
+    setSaving(true);
+    try {
+      const saved = await saveSiteContent(nextContent);
+      setContent(saved);
+      setLastSavedAt(new Date());
+    } finally {
+      setSaving(false);
+    }
   }, []);
 
   const resetContent = useCallback(() => {
     setContent(defaultSiteContent);
-    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const value = useMemo(
-    () => ({ content, hydrated, updateContent, resetContent }),
-    [content, hydrated, updateContent, resetContent]
+    () => ({ content, hydrated, saving, lastSavedAt, updateContent, resetContent }),
+    [content, hydrated, saving, lastSavedAt, updateContent, resetContent]
   );
 
   return (

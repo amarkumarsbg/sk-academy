@@ -1,38 +1,61 @@
-import { AdminHeader } from "@/components/admin/admin-shell";
-import { AdminDataTable } from "@/components/admin/admin-data-table";
-import { Badge } from "@/components/ui/badge";
-import { admissionApplications } from "@/data/mock";
+"use client";
 
-function statusVariant(status: string) {
-  if (status === "Approved") return "default";
-  if (status === "Under Review") return "secondary";
-  return "outline";
-}
+import { ResourceCrudPage, statusBadge } from "@/components/admin/resource-crud-page";
+
+const ADMISSION_STATUSES = ["Pending", "Approved", "Rejected"];
 
 export default function AdminAdmissionsPage() {
   return (
-    <>
-      <AdminHeader title="Admissions" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <AdminDataTable
-          columns={[
-            { key: "id", label: "Application ID" },
-            { key: "applicant", label: "Applicant" },
-            { key: "grade", label: "Grade" },
-            { key: "date", label: "Applied On" },
-            {
-              key: "status",
-              label: "Status",
-              render: (row) => (
-                <Badge variant={statusVariant(row.status as string)}>
-                  {row.status as string}
-                </Badge>
-              ),
-            },
-          ]}
-          data={admissionApplications}
-        />
-      </div>
-    </>
+    <ResourceCrudPage
+      title="Admissions"
+      resource="admissions"
+      idPrefix="ADM"
+      addLabel="Add Application"
+      searchPlaceholder="Search applicant..."
+      searchKeys={["applicant", "id", "parentName", "phone", "email"]}
+      filters={[
+        {
+          key: "status",
+          label: "Status",
+          options: ADMISSION_STATUSES,
+        },
+      ]}
+      emptyStateMessage="No admission applications found."
+      emptyItem={{
+        id: "",
+        applicant: "",
+        grade: "",
+        date: new Date().toISOString().slice(0, 10),
+        status: "Pending",
+        email: "",
+        phone: "",
+        parentName: "",
+        previousSchool: "",
+      }}
+      fields={[
+        { key: "applicant", label: "Applicant Name" },
+        { key: "grade", label: "Grade" },
+        { key: "date", label: "Applied On", type: "date" },
+        { key: "status", label: "Status", type: "select", options: ADMISSION_STATUSES },
+        { key: "parentName", label: "Parent Name" },
+        { key: "phone", label: "Phone", placeholder: "+91 98765 43210" },
+        { key: "email", label: "Email", placeholder: "parent@email.com" },
+        { key: "previousSchool", label: "Previous School" },
+      ]}
+      columns={[
+        { key: "id", label: "Application ID" },
+        { key: "applicant", label: "Applicant" },
+        { key: "grade", label: "Grade" },
+        { key: "parentName", label: "Parent" },
+        { key: "phone", label: "Phone" },
+        { key: "previousSchool", label: "Previous School" },
+        { key: "date", label: "Applied On" },
+        {
+          key: "status",
+          label: "Status",
+          render: (row) => statusBadge(row.status),
+        },
+      ]}
+    />
   );
 }

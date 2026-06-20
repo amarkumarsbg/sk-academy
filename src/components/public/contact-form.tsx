@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { submitContact } from "@/lib/api";
+import { ApiError } from "@/lib/api/client";
 
 type FormState = "idle" | "success" | "error";
 
@@ -43,8 +45,9 @@ export function ContactForm() {
   const [values, setValues] = useState<FormValues>({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState<FormErrors>({});
   const [state, setState] = useState<FormState>("idle");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate(values);
     setErrors(nextErrors);
@@ -54,7 +57,18 @@ export function ContactForm() {
       return;
     }
 
-    setState("success");
+    setSubmitting(true);
+    try {
+      await submitContact(values);
+      setState("success");
+    } catch (err) {
+      setErrors({
+        message: err instanceof ApiError ? err.message : "Failed to send message. Please try again.",
+      });
+      setState("error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (state === "success") {
@@ -65,7 +79,15 @@ export function ContactForm() {
           <p className="mt-2 text-sm text-muted-foreground">
             Thank you for contacting SK Academy. We will respond to your inquiry shortly.
           </p>
-          <Button type="button" variant="outline" className="mt-4" onClick={() => setState("idle")}>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-4"
+            onClick={() => {
+              setValues({ name: "", email: "", message: "" });
+              setState("idle");
+            }}
+          >
             Send another message
           </Button>
         </CardContent>
@@ -121,8 +143,8 @@ export function ContactForm() {
             </p>
           )}
 
-          <Button type="submit" className="w-full">
-            Send Message
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Sending..." : "Send Message"}
           </Button>
         </form>
       </CardContent>

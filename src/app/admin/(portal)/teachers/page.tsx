@@ -1,32 +1,66 @@
-import { AdminHeader } from "@/components/admin/admin-shell";
-import { AdminDataTable } from "@/components/admin/admin-data-table";
-import { Button } from "@/components/ui/button";
-import { teachers } from "@/data/mock";
-import { Plus } from "lucide-react";
+"use client";
+
+import { ResourceCrudPage } from "@/components/admin/resource-crud-page";
+
+const TEACHER_SUBJECTS = [
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "English",
+  "Hindi",
+  "Computer Science",
+  "Social Science",
+  "Physical Education",
+];
 
 export default function TeachersPage() {
   return (
-    <>
-      <AdminHeader title="Teachers" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">{teachers.length} teachers (demo data)</p>
-          <Button size="sm" disabled>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Teacher
-          </Button>
-        </div>
-        <AdminDataTable
-          columns={[
-            { key: "id", label: "ID" },
-            { key: "name", label: "Name" },
-            { key: "subject", label: "Subject" },
-            { key: "classes", label: "Classes" },
-            { key: "experience", label: "Experience" },
-          ]}
-          data={teachers}
-        />
-      </div>
-    </>
+    <ResourceCrudPage
+      title="Teachers"
+      resource="teachers"
+      idPrefix="TCH"
+      addLabel="Add Teacher"
+      searchPlaceholder="Search teacher..."
+      searchKeys={["name", "id", "subject", "email", "phone"]}
+      filters={[
+        {
+          key: "subject",
+          label: "Subject",
+          options: TEACHER_SUBJECTS,
+        },
+      ]}
+      emptyStateMessage="No teachers found."
+      emptyItem={{
+        id: "",
+        name: "",
+        subject: "",
+        classes: "",
+        experience: "",
+        phone: "",
+        email: "",
+        qualification: "",
+        joiningDate: "",
+      }}
+      fields={[
+        { key: "name", label: "Name" },
+        { key: "subject", label: "Subject", type: "select", options: TEACHER_SUBJECTS },
+        { key: "classes", label: "Classes", placeholder: "e.g. IX-X" },
+        { key: "phone", label: "Phone", placeholder: "+91 98765 43210" },
+        { key: "email", label: "Email", placeholder: "teacher@skacademy.edu" },
+        { key: "qualification", label: "Qualification", placeholder: "M.Sc. Mathematics" },
+        { key: "joiningDate", label: "Joining Date", type: "date" },
+        { key: "experience", label: "Experience", placeholder: "10 yrs" },
+      ]}
+      columns={[
+        { key: "id", label: "ID" },
+        { key: "name", label: "Name" },
+        { key: "subject", label: "Subject" },
+        { key: "phone", label: "Phone" },
+        { key: "email", label: "Email" },
+        { key: "qualification", label: "Qualification" },
+        { key: "joiningDate", label: "Joined" },
+      ]}
+    />
   );
 }

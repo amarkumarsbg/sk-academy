@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSiteContent } from "@/context/site-content-provider";
-import { formatDateLong } from "@/lib/format-date";
+import { formatDateLong, sortByDateDesc } from "@/lib/format-date";
 import type { NewsCategory } from "@/types/site-content";
 
 const NEWS_CATEGORIES: Array<NewsCategory | "All"> = [
@@ -26,10 +26,14 @@ export function NewsPageContent() {
   const { content } = useSiteContent();
   const { news, notices, pageHeroes } = content;
   const [activeCategory, setActiveCategory] = useState<string>("All");
-  const publishedNotices = notices.filter((n) => n.status === "Published");
+  const publishedNotices = sortByDateDesc(notices.filter((n) => n.status === "Published"));
 
-  const filteredNews =
-    activeCategory === "All" ? news : news.filter((item) => item.category === activeCategory);
+  const publishedNews = news.filter((n) => (n.status ?? "Published") === "Published");
+  const filteredNews = sortByDateDesc(
+    activeCategory === "All"
+      ? publishedNews
+      : publishedNews.filter((item) => item.category === activeCategory)
+  );
 
   return (
     <>

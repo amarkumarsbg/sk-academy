@@ -48,7 +48,14 @@ export function mergeStoredSiteContent(stored: Partial<SiteContent>): SiteConten
   const merged: SiteContent = {
     ...defaultSiteContent,
     ...stored,
-    settings: { ...defaultSiteContent.settings, ...stored.settings, logo: OFFICIAL_LOGO },
+    settings: {
+      ...defaultSiteContent.settings,
+      ...stored.settings,
+      logo: OFFICIAL_LOGO,
+      social: { ...defaultSiteContent.settings.social, ...stored.settings?.social },
+      seo: { ...defaultSiteContent.settings.seo, ...stored.settings?.seo },
+      theme: { ...defaultSiteContent.settings.theme, ...stored.settings?.theme },
+    },
     announcement: { ...defaultSiteContent.announcement, ...stored.announcement },
     highlightsSection: { ...defaultSiteContent.highlightsSection, ...stored.highlightsSection },
     homepage: { ...defaultSiteContent.homepage, ...stored.homepage },

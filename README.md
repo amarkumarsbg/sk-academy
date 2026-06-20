@@ -1,53 +1,93 @@
-# SK Academy — School Management System (Frontend Demo)
+# SK Academy — School Management System
 
-A modern, full-stack-ready frontend demo for **SK Academy** with two connected portals:
-
-- **Public Website** — About, Admissions, Academics, Events, News, Gallery, Contact
-- **Admin Portal** — Dashboard, Students, Teachers, Admissions, Attendance, Fees, Exams, Results, Notices, Events, CMS, Settings
-
-> **Note:** This is a **frontend-only demo** with mock data. Backend API, database, and authentication will be added in a future phase.
+A full-stack school management app for **SK Academy** with a public website and staff admin portal.
 
 ## Tech Stack
 
-- **Next.js 16** (App Router)
-- **TypeScript**
-- **Tailwind CSS v4**
-- **shadcn/ui**
-- **Lucide Icons**
+### Frontend
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- Leaflet (school map), Motion (animations)
+
+### Backend (`server/`)
+- Node.js + Express (TypeScript)
+- MongoDB + Mongoose
+- JWT auth (httpOnly cookie)
+- Multer (image uploads to local `/uploads`)
 
 ## Getting Started
 
+### Prerequisites
+- Node.js 20+
+- MongoDB running locally (or MongoDB Atlas URI in `server/.env`)
+
+### 1. Install dependencies
+
 ```bash
 npm install
+npm install --prefix server
+```
+
+### 2. Configure environment
+
+```bash
+cp server/.env.example server/.env
+cp .env.local.example .env.local
+```
+
+Edit `server/.env` if needed (MongoDB URI, JWT secret, admin credentials).
+
+### 3. Seed the database
+
+```bash
+npm run seed
+```
+
+Creates admin user, site content, and sample school data.
+
+### 4. Run development servers
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the public site.
+- Public site: [http://localhost:3000](http://localhost:3000)
+- Admin login: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+- API (direct): [http://localhost:4000](http://localhost:4000)
 
-- **Staff Portal:** [http://localhost:3000/admin/login](http://localhost:3000/admin/login) → click "Sign In (Demo)" to enter the admin dashboard.
+**Default admin credentials** (after seed):
+- Email: `admin@skacademy.edu`
+- Password: `admin1234`
 
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── (public)/          # Public website pages
-│   └── admin/
-│       ├── login/         # Demo login page
-│       └── (portal)/      # Admin dashboard & modules
-├── components/
-│   ├── public/            # Header, footer, hero
-│   └── admin/             # Sidebar, data tables
-├── data/mock/             # Mock data (replace with API later)
-└── lib/config.ts          # Site config & navigation
+src/                    # Next.js frontend
+  app/(public)/         # Public website
+  app/admin/            # Staff portal
+  lib/api/              # API client
+server/                 # Express REST API
+  src/models/           # Mongoose models
+  src/routes/           # API routes
+  src/scripts/seed.ts   # Database seed
 ```
 
-## Future Backend Integration
+## API Overview
 
-When ready, replace mock data in `src/data/mock/` with API calls to:
+All routes are proxied via Next.js rewrites at `/api/*`.
 
-- PostgreSQL + Prisma
-- Auth.js for staff login & RBAC
-- REST or tRPC API routes
+| Route | Auth | Description |
+|-------|------|-------------|
+| `POST /api/auth/login` | Public | Staff login |
+| `GET /api/site-content` | Public | Website CMS content |
+| `PUT /api/site-content` | Staff | Update CMS content |
+| `GET/POST /api/students` etc. | Staff | CRUD for school modules |
+| `POST /api/contact` | Public | Contact form submission |
+| `POST /api/admission-inquiries` | Public | Admission inquiry |
+| `POST /api/upload` | Staff | Image upload |
 
-Forms and action buttons are intentionally disabled or demo-only until the backend is built.
+## Deployment
+
+- **Frontend:** Vercel (set `API_URL` to your Express server URL)
+- **Backend:** Render / Railway (always-on Node service)
+- **Database:** MongoDB Atlas

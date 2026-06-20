@@ -1,37 +1,46 @@
-import { AdminHeader } from "@/components/admin/admin-shell";
-import { AdminDataTable } from "@/components/admin/admin-data-table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { examSchedule } from "@/data/mock";
-import { Plus } from "lucide-react";
+"use client";
+
+import { ResourceCrudPage, statusBadge } from "@/components/admin/resource-crud-page";
+
+const EXAM_STATUSES = ["Scheduled", "Ongoing", "Completed", "Upcoming"];
 
 export default function ExamsPage() {
   return (
-    <>
-      <AdminHeader title="Examinations" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="mb-4 flex justify-end">
-          <Button size="sm" disabled>
-            <Plus className="mr-2 h-4 w-4" />
-            Schedule Exam
-          </Button>
-        </div>
-        <AdminDataTable
-          columns={[
-            { key: "id", label: "Exam ID" },
-            { key: "name", label: "Exam Name" },
-            { key: "class", label: "Class" },
-            { key: "startDate", label: "Start Date" },
-            { key: "endDate", label: "End Date" },
-            {
-              key: "status",
-              label: "Status",
-              render: (row) => <Badge variant="outline">{row.status as string}</Badge>,
-            },
-          ]}
-          data={examSchedule}
-        />
-      </div>
-    </>
+    <ResourceCrudPage
+      title="Exams"
+      resource="exams"
+      idPrefix="EX"
+      addLabel="Add Exam"
+      searchPlaceholder="Search exam..."
+      searchKeys={["name", "id", "class"]}
+      emptyStateMessage="No exams found."
+      emptyItem={{
+        id: "",
+        name: "",
+        class: "",
+        startDate: "",
+        endDate: "",
+        status: "Scheduled",
+      }}
+      fields={[
+        { key: "name", label: "Name" },
+        { key: "class", label: "Class" },
+        { key: "startDate", label: "Start Date", type: "date" },
+        { key: "endDate", label: "End Date", type: "date" },
+        { key: "status", label: "Status", type: "select", options: EXAM_STATUSES },
+      ]}
+      columns={[
+        { key: "id", label: "ID" },
+        { key: "name", label: "Name" },
+        { key: "class", label: "Class" },
+        { key: "startDate", label: "Start" },
+        { key: "endDate", label: "End" },
+        {
+          key: "status",
+          label: "Status",
+          render: (row) => statusBadge(row.status),
+        },
+      ]}
+    />
   );
 }

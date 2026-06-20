@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo } from "react";
 import {
   Award,
   CalendarCheck,
@@ -9,8 +12,10 @@ import {
 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { dashboardStats, recentActivities } from "@/data/mock";
+import { useResource } from "@/hooks/use-resource";
+import { formatIndianRupees } from "@/lib/format-currency";
+import { formatTodayLong, getTodayISO } from "@/lib/today";
+import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
   GraduationCap,
@@ -19,16 +24,117 @@ const iconMap: Record<string, LucideIcon> = {
   IndianRupee,
 };
 
+const quickActions = [
+  {
+    label: "Add Student",
+    href: "/admin/students",
+    icon: GraduationCap,
+    iconClass: "text-blue-600",
+    bgClass: "bg-blue-50 hover:bg-blue-100/80",
+  },
+  {
+    label: "Mark Attendance",
+    href: "/admin/attendance",
+    icon: CalendarCheck,
+    iconClass: "text-emerald-600",
+    bgClass: "bg-emerald-50 hover:bg-emerald-100/80",
+  },
+  {
+    label: "Record Fee",
+    href: "/admin/fees",
+    icon: IndianRupee,
+    iconClass: "text-orange-600",
+    bgClass: "bg-orange-50 hover:bg-orange-100/80",
+  },
+  {
+    label: "Manage CMS",
+    href: "/admin/cms",
+    icon: Award,
+    iconClass: "text-violet-600",
+    bgClass: "bg-violet-50 hover:bg-violet-100/80",
+  },
+] as const;
+
 export default function AdminDashboardPage() {
+  const today = getTodayISO();
+  const todayLabel = formatTodayLong();
+
+  const { items: students, loading: studentsLoading } = useResource<{ id: string; status: string }>("students");
+  const { items: teachers, loading: teachersLoading } = useResource<{ id: string }>("teachers");
+  const { items: fees, loading: feesLoading } = useResource<{ id: string; due: number; status: string }>("fees");
+  const { items: attendance, loading: attendanceLoading } = useResource<{
+    id: string;
+    status: string;
+    date: string;
+  }>("attendance");
+
+  const activeStudents = students.filter((s) => s.status === "Active").length;
+
+  const pendingFees = fees.filter((f) => f.status !== "Paid");
+  const pendingAmount = pendingFees.reduce((sum, f) => sum + (f.due ?? 0), 0);
+
+  const todayAttendance = useMemo(
+    () => attendance.filter((record) => record.date === today),
+    [attendance, today]
+  );
+  const presentToday = todayAttendance.filter((r) => r.status === "Present").length;
+  const absentToday = todayAttendance.filter((r) => r.status === "Absent").length;
+  const lateToday = todayAttendance.filter((r) => r.status === "Late").length;
+  const attendanceRate =
+    todayAttendance.length > 0
+      ? Math.round((presentToday / todayAttendance.length) * 100)
+      : null;
+
+  const dashboardStats = [
+    {
+      label: "Total Students",
+      value: studentsLoading ? "…" : String(students.length),
+      change: studentsLoading ? "Loading…" : `${activeStudents} active · ${students.length} enrolled`,
+      icon: "GraduationCap" as const,
+    },
+    {
+      label: "Teachers",
+      value: teachersLoading ? "…" : String(teachers.length),
+      change: teachersLoading ? "Loading…" : `${teachers.length} on staff`,
+      icon: "Users" as const,
+    },
+    {
+      label: "Today's Attendance",
+      value: attendanceLoading
+        ? "…"
+        : attendanceRate !== null
+          ? `${attendanceRate}%`
+          : "Not marked",
+      change: attendanceLoading
+        ? "Loading…"
+        : todayAttendance.length > 0
+          ? `${presentToday} present · ${absentToday} absent${lateToday > 0 ? ` · ${lateToday} late` : ""}`
+          : "No attendance recorded for today",
+      href: todayAttendance.length === 0 ? "/admin/attendance" : undefined,
+      icon: "CalendarCheck" as const,
+    },
+    {
+      label: "Pending Fees",
+      value: feesLoading ? "…" : formatIndianRupees(pendingAmount),
+      change: feesLoading
+        ? "Loading…"
+        : pendingFees.length === 0
+          ? "All fees collected"
+          : `${pendingFees.length} student${pendingFees.length === 1 ? "" : "s"} pending`,
+      href: pendingFees.length > 0 ? "/admin/fees" : undefined,
+      icon: "IndianRupee" as const,
+    },
+  ];
+
   return (
     <>
-      <AdminHeader title="Dashboard" />
+      <AdminHeader title="Dashboard" welcome subtitle={todayLabel} />
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {dashboardStats.map((stat) => {
             const Icon = iconMap[stat.icon];
-            return (
-              <Card key={stat.label}>
+            const content = (
+              <Card className={cn(stat.href && "transition-colors hover:border-primary/30")}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.label}
@@ -41,61 +147,37 @@ export default function AdminDashboardPage() {
                 </CardContent>
               </Card>
             );
+
+            return stat.href ? (
+              <Link key={stat.label} href={stat.href} className="block">
+                {content}
+              </Link>
+            ) : (
+              <div key={stat.label}>{content}</div>
+            );
           })}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {recentActivities.map((activity, i) => (
-                  <li key={i} className="flex items-start justify-between gap-4 border-b pb-4 last:border-0 last:pb-0">
-                    <div>
-                      <p className="text-sm font-medium">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.detail}</p>
-                    </div>
-                    <span className="shrink-0 text-xs text-muted-foreground">{activity.time}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Add Student", href: "/admin/students", icon: GraduationCap },
-                { label: "Mark Attendance", href: "/admin/attendance", icon: CalendarCheck },
-                { label: "Record Fee", href: "/admin/fees", icon: IndianRupee },
-                { label: "Publish Notice", href: "/admin/notices", icon: Award },
-              ].map((action) => (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className="flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors hover:bg-accent"
-                >
-                  <action.icon className="h-5 w-5 text-primary" />
-                  <span className="text-xs font-medium">{action.label}</span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="mt-6 border-dashed">
-          <CardContent className="flex items-center justify-between py-4">
-            <div>
-              <Badge variant="secondary" className="mb-2">Frontend Demo</Badge>
-              <p className="text-sm text-muted-foreground">
-                All data shown is mock data. Backend API integration planned for a future phase.
-              </p>
-            </div>
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {quickActions.map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className={cn(
+                  "flex flex-col items-center gap-3 rounded-lg border p-4 text-center transition-colors",
+                  action.bgClass
+                )}
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+                  <action.icon className={cn("h-5 w-5", action.iconClass)} />
+                </div>
+                <span className="text-xs font-medium">{action.label}</span>
+              </Link>
+            ))}
           </CardContent>
         </Card>
       </div>

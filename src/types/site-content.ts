@@ -17,6 +17,15 @@ export interface SiteSettings {
     instagram: string;
     youtube: string;
   };
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    metaKeywords: string;
+  };
+  theme: {
+    primaryColor: string;
+    accentColor: string;
+  };
 }
 
 export interface AnnouncementContent {
@@ -100,6 +109,7 @@ export interface NewsItem {
   date: string;
   category: NewsCategory | string;
   image: string;
+  status: "Published" | "Draft";
 }
 
 export interface EventItem {
@@ -109,6 +119,7 @@ export interface EventItem {
   time: string;
   location: string;
   type: string;
+  description?: string;
 }
 
 export interface NoticeItem {
@@ -153,7 +164,7 @@ export interface AboutContent {
   mission: string;
   vision: string;
   values: FeatureItem[];
-  leadership: { name: string; role: string; bio: string }[];
+  leadership: { name: string; role: string; bio: string; photo?: string }[];
 }
 
 export interface AcademicsContent {

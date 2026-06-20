@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSiteContent } from "@/context/site-content-provider";
-import { formatDay, formatMonthShort } from "@/lib/format-date";
+import { formatDay, formatMonthShort, sortByDateDesc } from "@/lib/format-date";
 import { BookOpen, Calendar, CheckCircle2, GraduationCap, Quote, Users } from "lucide-react";
 
 const featureIcons = [GraduationCap, Users, BookOpen, Calendar];
@@ -179,7 +179,7 @@ export function HomePageContent() {
             </ButtonLink>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {news.slice(0, 3).map((item) => (
+            {sortByDateDesc(news.filter((n) => (n.status ?? "Published") === "Published")).slice(0, 3).map((item) => (
               <Card key={item.id} className="card-interactive overflow-hidden border-0 bg-white pt-0">
                 <div className="relative aspect-video">
                   <ContentImage src={item.image} alt={item.title} fill className="object-cover" />

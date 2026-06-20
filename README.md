@@ -88,6 +88,13 @@ All routes are proxied via Next.js rewrites at `/api/*`.
 
 ## Deployment
 
-- **Frontend:** Vercel (set `API_URL` to your Express server URL)
-- **Backend:** Render / Railway (always-on Node service)
-- **Database:** MongoDB Atlas
+Deploy with **Vercel** (frontend) + **Render** (backend) + **MongoDB Atlas** (database).
+
+See **[DEPLOY.md](./DEPLOY.md)** for the full step-by-step guide.
+
+Quick summary:
+
+1. Deploy `server/` to **Render** (uses `render.yaml`).
+2. Deploy the repo root to **Vercel** with `API_URL=https://your-api.onrender.com`.
+3. Set Render `CLIENT_URL` to your Vercel URL.
+4. Run `npm run seed` once against Atlas.

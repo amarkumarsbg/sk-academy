@@ -42,7 +42,11 @@ export function setAuthCookie(res: Response, token: string) {
 }
 
 export function clearAuthCookie(res: Response) {
-  res.clearCookie(COOKIE_NAME, { path: "/" });
+  res.clearCookie(COOKIE_NAME, {
+    path: "/",
+    secure: env.isProduction,
+    sameSite: "lax",
+  });
 }
 
 export function authRequired(req: Request, _res: Response, next: NextFunction) {

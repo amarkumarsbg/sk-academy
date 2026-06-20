@@ -14,6 +14,7 @@ async function main() {
 
   const app = express();
 
+  app.set("trust proxy", 1);
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(
     cors({
@@ -42,8 +43,8 @@ async function main() {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  app.listen(env.port, () => {
-    console.log(`API server running on http://localhost:${env.port}`);
+  app.listen(env.port, "0.0.0.0", () => {
+    console.log(`API server running on port ${env.port}`);
   });
 }
 

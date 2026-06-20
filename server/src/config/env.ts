@@ -15,7 +15,7 @@ export const env = {
   mongoUri: required("MONGODB_URI"),
   jwtSecret: required("JWT_SECRET"),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "7d",
-  clientUrl: process.env.CLIENT_URL ?? "http://localhost:3000",
+  clientUrl: (process.env.CLIENT_URL ?? "http://localhost:3000").replace(/\/$/, ""),
   uploadDir: process.env.UPLOAD_DIR ?? "uploads",
   adminEmail: process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",

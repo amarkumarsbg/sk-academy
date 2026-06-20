@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminHeader } from "@/components/admin/admin-shell";
+import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
 import { AddItemButton, ListItemCard } from "@/components/admin/cms-form-fields";
 import { Badge } from "@/components/ui/badge";
@@ -216,7 +217,7 @@ export function ResultsPageContent() {
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
-            {loading ? "Loading..." : `${items.length} results`}
+            {loading ? <AdminLoadingText label="Loading results..." /> : `${items.length} results`}
           </p>
           <Button size="sm" onClick={openCreate}>
             <Plus className="mr-2 h-4 w-4" />
@@ -236,18 +237,18 @@ export function ResultsPageContent() {
 
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-        {filtered.length > 0 ? (
+        {loading && filtered.length === 0 ? (
+          <AdminPageLoading label="Loading results..." />
+        ) : filtered.length > 0 ? (
           <AdminDataTable columns={columns} data={filtered} />
         ) : (
-          !loading && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
               <p className="mb-4 text-sm text-muted-foreground">No results found.</p>
               <Button size="sm" onClick={openCreate}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Result
               </Button>
             </div>
-          )
         )}
       </div>
 

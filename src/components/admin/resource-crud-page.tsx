@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
 import { Badge } from "@/components/ui/badge";
@@ -184,7 +185,7 @@ export function ResourceCrudPage<T extends { id: string }>({
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
-            {loading ? "Loading..." : `${items.length} records`}
+            {loading ? <AdminLoadingText /> : `${items.length} records`}
           </p>
           <Button size="sm" onClick={openCreate}>
             <Plus className="mr-2 h-4 w-4" />
@@ -235,18 +236,18 @@ export function ResourceCrudPage<T extends { id: string }>({
 
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-        {filtered.length > 0 ? (
+        {loading && filtered.length === 0 ? (
+          <AdminPageLoading label={`Loading ${title.toLowerCase()}...`} />
+        ) : filtered.length > 0 ? (
           <AdminDataTable columns={tableColumns} data={filtered} />
         ) : (
-          !loading && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
               <p className="mb-4 text-sm text-muted-foreground">{emptyMessage}</p>
               <Button size="sm" onClick={openCreate}>
                 <Plus className="mr-2 h-4 w-4" />
                 {addLabel}
               </Button>
             </div>
-          )
         )}
 
         <Dialog open={open} onOpenChange={setOpen}>

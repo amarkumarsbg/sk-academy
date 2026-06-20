@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown, Trash2, Upload } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
+import { AdminButtonSpinner, LoadingSpinner } from "@/components/admin/admin-loading";
 import { markCmsSectionSaved, useCmsToast } from "@/components/admin/cms-toast";
 import { ContentImage } from "@/components/public/content-image";
 import { useSiteContent } from "@/context/site-content-provider";
@@ -59,7 +60,7 @@ export function CmsStickyFooter({
             </Button>
           )}
           <Button type="button" disabled={!isDirty || saving} onClick={() => void onSave()}>
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? <AdminButtonSpinner label="Saving..." /> : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -384,14 +385,30 @@ export function ImageUploadField({
           <>
             <ContentImage src={value} alt="Preview" fill className="object-cover" />
             <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-xs font-medium text-white opacity-0 transition hover:bg-black/40 hover:opacity-100">
-              {loading ? "Uploading…" : "Click or drop to replace"}
+              {loading ? (
+                <span className="inline-flex items-center gap-2 text-white opacity-100">
+                  <LoadingSpinner size="sm" className="text-white" />
+                  Uploading…
+                </span>
+              ) : (
+                "Click or drop to replace"
+              )}
             </span>
           </>
         ) : (
           <span className="flex h-full min-h-24 w-full flex-col items-center justify-center gap-2 p-4 text-center text-xs text-muted-foreground">
-            <Upload className="h-5 w-5" />
-            <span>{loading ? "Uploading…" : "Drag & drop image here"}</span>
-            {!loading && <span>or click to browse</span>}
+            {loading ? (
+              <>
+                <LoadingSpinner size="md" className="text-primary" />
+                <span>Uploading…</span>
+              </>
+            ) : (
+              <>
+                <Upload className="h-5 w-5" />
+                <span>Drag & drop image here</span>
+                <span>or click to browse</span>
+              </>
+            )}
           </span>
         )}
       </button>

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminHeader } from "@/components/admin/admin-shell";
+import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
 import { ImageUploadField } from "@/components/admin/cms-form-fields";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -213,7 +214,7 @@ export function StudentsPageContent() {
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
-            {loading ? "Loading..." : `${items.length} students total`}
+            {loading ? <AdminLoadingText label="Loading students..." /> : `${items.length} students total`}
           </p>
           <Button size="sm" onClick={openCreate}>
             <Plus className="mr-2 h-4 w-4" />
@@ -277,7 +278,9 @@ export function StudentsPageContent() {
 
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-        {filtered.length > 0 ? (
+        {loading && filtered.length === 0 ? (
+          <AdminPageLoading label="Loading students..." />
+        ) : filtered.length > 0 ? (
           <>
             <AdminDataTable columns={columns} data={paginated} />
             <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
@@ -323,19 +326,17 @@ export function StudentsPageContent() {
             </div>
           </>
         ) : (
-          !loading && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-              <p className="mb-4 text-sm text-muted-foreground">
-                {search || classFilter !== "All" || statusFilter !== "All"
-                  ? "No students match your search or filters."
-                  : "No students found."}
-              </p>
-              <Button size="sm" onClick={openCreate}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Student
-              </Button>
-            </div>
-          )
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
+            <p className="mb-4 text-sm text-muted-foreground">
+              {search || classFilter !== "All" || statusFilter !== "All"
+                ? "No students match your search or filters."
+                : "No students found."}
+            </p>
+            <Button size="sm" onClick={openCreate}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Student
+            </Button>
+          </div>
         )}
       </div>
 

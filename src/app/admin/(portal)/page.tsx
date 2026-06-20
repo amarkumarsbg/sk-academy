@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
+import { AdminLoadingText, AdminStatLoading } from "@/components/admin/admin-loading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useResource } from "@/hooks/use-resource";
 import { formatIndianRupees } from "@/lib/format-currency";
@@ -88,26 +89,24 @@ export default function AdminDashboardPage() {
   const dashboardStats = [
     {
       label: "Total Students",
-      value: studentsLoading ? "…" : String(students.length),
-      change: studentsLoading ? "Loading…" : `${activeStudents} active · ${students.length} enrolled`,
+      loading: studentsLoading,
+      value: String(students.length),
+      change: `${activeStudents} active · ${students.length} enrolled`,
       icon: "GraduationCap" as const,
     },
     {
       label: "Teachers",
-      value: teachersLoading ? "…" : String(teachers.length),
-      change: teachersLoading ? "Loading…" : `${teachers.length} on staff`,
+      loading: teachersLoading,
+      value: String(teachers.length),
+      change: `${teachers.length} on staff`,
       icon: "Users" as const,
     },
     {
       label: "Today's Attendance",
-      value: attendanceLoading
-        ? "…"
-        : attendanceRate !== null
-          ? `${attendanceRate}%`
-          : "Not marked",
-      change: attendanceLoading
-        ? "Loading…"
-        : todayAttendance.length > 0
+      loading: attendanceLoading,
+      value: attendanceRate !== null ? `${attendanceRate}%` : "Not marked",
+      change:
+        todayAttendance.length > 0
           ? `${presentToday} present · ${absentToday} absent${lateToday > 0 ? ` · ${lateToday} late` : ""}`
           : "No attendance recorded for today",
       href: todayAttendance.length === 0 ? "/admin/attendance" : undefined,
@@ -115,10 +114,10 @@ export default function AdminDashboardPage() {
     },
     {
       label: "Pending Fees",
-      value: feesLoading ? "…" : formatIndianRupees(pendingAmount),
-      change: feesLoading
-        ? "Loading…"
-        : pendingFees.length === 0
+      loading: feesLoading,
+      value: formatIndianRupees(pendingAmount),
+      change:
+        pendingFees.length === 0
           ? "All fees collected"
           : `${pendingFees.length} student${pendingFees.length === 1 ? "" : "s"} pending`,
       href: pendingFees.length > 0 ? "/admin/fees" : undefined,
@@ -142,8 +141,14 @@ export default function AdminDashboardPage() {
                   {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.change}</p>
+                  {stat.loading ? (
+                    <AdminStatLoading />
+                  ) : (
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {stat.loading ? <AdminLoadingText label="Loading..." className="mt-2" /> : stat.change}
+                  </p>
                 </CardContent>
               </Card>
             );

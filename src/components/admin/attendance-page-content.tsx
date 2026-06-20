@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AdminHeader } from "@/components/admin/admin-shell";
+import { AdminLoadingText, AdminPageLoading, AdminButtonSpinner } from "@/components/admin/admin-loading";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -206,13 +207,17 @@ export function AttendancePageContent() {
               <>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm text-muted-foreground">
-                    {studentsLoading
-                      ? "Loading students..."
-                      : `${classStudents.length} students in ${selectedClass}`}
-                    {classStudents.length > 0 && (
-                      <span className="ml-2">
-                        · {presentCount} present · {absentCount} absent · {lateCount} late
-                      </span>
+                    {studentsLoading ? (
+                      <AdminLoadingText label="Loading students..." />
+                    ) : (
+                      <>
+                        {`${classStudents.length} students in ${selectedClass}`}
+                        {classStudents.length > 0 && (
+                          <span className="ml-2">
+                            · {presentCount} present · {absentCount} absent · {lateCount} late
+                          </span>
+                        )}
+                      </>
                     )}
                   </p>
                   <div className="flex gap-2">
@@ -220,8 +225,14 @@ export function AttendancePageContent() {
                       Mark All Present
                     </Button>
                     <Button size="sm" onClick={saveRollCall} disabled={saving || classStudents.length === 0}>
-                      <Save className="mr-2 h-4 w-4" />
-                      {saving ? "Saving..." : "Save Attendance"}
+                      {saving ? (
+                        <AdminButtonSpinner label="Saving..." />
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Attendance
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -232,7 +243,9 @@ export function AttendancePageContent() {
                   </p>
                 )}
 
-                {classStudents.length === 0 && !studentsLoading ? (
+                {studentsLoading ? (
+                  <AdminPageLoading label="Loading students..." />
+                ) : classStudents.length === 0 ? (
                   <p className="py-8 text-center text-sm text-muted-foreground">
                     No active students found in {selectedClass}.
                   </p>
@@ -297,7 +310,7 @@ export function AttendancePageContent() {
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-sm font-medium">Attendance History</h2>
           <p className="text-sm text-muted-foreground">
-            {loading ? "Loading..." : `${items.length} records`}
+            {loading ? <AdminLoadingText /> : `${items.length} records`}
           </p>
         </div>
 
@@ -331,11 +344,12 @@ export function AttendancePageContent() {
 
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-        {filteredHistory.length > 0 ? (
+        {loading && filteredHistory.length === 0 ? (
+          <AdminPageLoading label="Loading attendance..." />
+        ) : filteredHistory.length > 0 ? (
           <AdminDataTable columns={historyColumns} data={filteredHistory} />
         ) : (
-          !loading && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
               <p className="mb-4 text-sm text-muted-foreground">No attendance records found.</p>
               <Button
                 size="sm"
@@ -347,7 +361,6 @@ export function AttendancePageContent() {
                 Mark Attendance
               </Button>
             </div>
-          )
         )}
       </div>
     </>

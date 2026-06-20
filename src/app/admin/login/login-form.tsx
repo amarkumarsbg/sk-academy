@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AdminButtonSpinner } from "@/components/admin/admin-loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -78,7 +79,7 @@ export default function AdminLoginForm() {
               </p>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? <AdminButtonSpinner label="Signing in..." /> : "Sign In"}
             </Button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">

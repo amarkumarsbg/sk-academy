@@ -146,8 +146,12 @@ UPLOAD_DIR=uploads
 ADMIN_EMAIL=admin@skacademy.edu
 ADMIN_PASSWORD=your-secure-password
 
-# Optional — email + password reset
+# Optional — email + password reset (Resend recommended)
 NOTIFY_EMAIL=admissions@skacademy.edu
+RESEND_API_KEY=re_xxxxxxxx
+RESEND_FROM="SK Academy <noreply@yourdomain.com>"
+
+# SMTP fallback (only if RESEND_API_KEY is not set)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
@@ -177,9 +181,13 @@ CLOUDINARY_API_SECRET=
 - Without Cloudinary, uploads use Render’s local disk and **may be lost on redeploy**.
 
 ### Email notifications
-- Set SMTP vars on Render to receive email when someone submits contact or admission inquiry forms:
-  - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `NOTIFY_EMAIL`
-- Forms still save to the admin **Inbox** without SMTP.
+- **Resend (recommended):** set `RESEND_API_KEY` and `RESEND_FROM` on Render.
+  - Create an API key at [resend.com](https://resend.com).
+  - For testing, use `onboarding@resend.dev` as the from address.
+  - For production, verify your domain in Resend and use e.g. `noreply@yourdomain.com`.
+- **SMTP fallback:** if `RESEND_API_KEY` is not set, the server uses `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM`.
+- Set `NOTIFY_EMAIL` to receive contact/admission form alerts.
+- Forms still save to the admin **Inbox** without email configured.
 
 ### CAPTCHA (optional)
 - Create keys at [Cloudflare Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile).

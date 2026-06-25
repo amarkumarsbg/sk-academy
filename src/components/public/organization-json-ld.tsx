@@ -1,9 +1,23 @@
-"use client";
+import { defaultSiteContent } from "@/data/default-content";
+import { fetchSiteContent } from "@/lib/api";
+import { mergeStoredSiteContent } from "@/lib/merge-site-content";
 
-import { useSiteContent } from "@/context/site-content-provider";
+function getBaseUrl() {
+  return (
+    process.env.CLIENT_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+  ).replace(/\/$/, "");
+}
 
-export function OrganizationJsonLd() {
-  const { content } = useSiteContent();
+export async function OrganizationJsonLd() {
+  let content = defaultSiteContent;
+
+  try {
+    content = mergeStoredSiteContent(await fetchSiteContent());
+  } catch {
+    // use defaults during build/offline
+  }
+
   const { settings } = content;
 
   const jsonLd = {
@@ -11,7 +25,7 @@ export function OrganizationJsonLd() {
     "@type": "School",
     name: settings.name,
     description: settings.description,
-    url: typeof window !== "undefined" ? window.location.origin : "",
+    url: getBaseUrl(),
     telephone: settings.phone,
     email: settings.email,
     address: {

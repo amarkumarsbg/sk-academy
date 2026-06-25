@@ -29,15 +29,21 @@ const statusColors: Record<InboxStatus, string> = {
   resolved: "bg-emerald-600 text-white",
 };
 
+function normalizeStatus(status: InboxStatus | undefined): InboxStatus {
+  return status ?? "new";
+}
+
 function StatusSelect({
   value,
   onChange,
 }: {
-  value: InboxStatus;
+  value: InboxStatus | undefined;
   onChange: (status: InboxStatus) => void;
 }) {
+  const status = normalizeStatus(value);
+
   return (
-    <Select value={value} onValueChange={(v) => onChange((v ?? "new") as InboxStatus)}>
+    <Select value={status} onValueChange={(v) => onChange(normalizeStatus(v as InboxStatus | undefined))}>
       <SelectTrigger className="w-[140px]">
         <SelectValue />
       </SelectTrigger>
@@ -96,10 +102,10 @@ export function InboxPageContent() {
           <Tabs defaultValue="contact">
             <TabsList>
               <TabsTrigger value="contact">
-                Contact ({contactMessages.filter((m) => m.status === "new").length} new)
+                Contact ({contactMessages.filter((m) => normalizeStatus(m.status) === "new").length} new)
               </TabsTrigger>
               <TabsTrigger value="inquiries">
-                Admissions ({inquiries.filter((m) => m.status === "new").length} new)
+                Admissions ({inquiries.filter((m) => normalizeStatus(m.status) === "new").length} new)
               </TabsTrigger>
             </TabsList>
 
@@ -114,7 +120,7 @@ export function InboxPageContent() {
                         <CardTitle className="text-base">{message.name}</CardTitle>
                         <p className="text-xs text-muted-foreground">{formatDateTimeLong(new Date(message.createdAt))}</p>
                       </div>
-                      <Badge className={statusColors[message.status]}>{message.status}</Badge>
+                      <Badge className={statusColors[normalizeStatus(message.status)]}>{normalizeStatus(message.status)}</Badge>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -139,7 +145,7 @@ export function InboxPageContent() {
                           <Textarea
                             rows={2}
                             defaultValue={message.notes ?? ""}
-                            onBlur={(e) => void updateContact(message._id, { status: message.status, notes: e.target.value })}
+                            onBlur={(e) => void updateContact(message._id, { status: normalizeStatus(message.status), notes: e.target.value })}
                           />
                         </div>
                       </div>
@@ -160,7 +166,7 @@ export function InboxPageContent() {
                         <CardTitle className="text-base">{inquiry.name}</CardTitle>
                         <p className="text-xs text-muted-foreground">{formatDateTimeLong(new Date(inquiry.createdAt))}</p>
                       </div>
-                      <Badge className={statusColors[inquiry.status]}>{inquiry.status}</Badge>
+                      <Badge className={statusColors[normalizeStatus(inquiry.status)]}>{normalizeStatus(inquiry.status)}</Badge>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
@@ -187,7 +193,7 @@ export function InboxPageContent() {
                           <Textarea
                             rows={2}
                             defaultValue={inquiry.notes ?? ""}
-                            onBlur={(e) => void updateInquiry(inquiry._id, { status: inquiry.status, notes: e.target.value })}
+                            onBlur={(e) => void updateInquiry(inquiry._id, { status: normalizeStatus(inquiry.status), notes: e.target.value })}
                           />
                         </div>
                       </div>

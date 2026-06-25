@@ -21,6 +21,11 @@ export const env = {
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",
   isProduction: process.env.NODE_ENV === "production",
   notifyEmail: process.env.NOTIFY_EMAIL ?? process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
+  resendApiKey: process.env.RESEND_API_KEY ?? "",
+  resendFrom:
+    process.env.RESEND_FROM ??
+    process.env.SMTP_FROM ??
+    "SK Academy <onboarding@resend.dev>",
   smtpHost: process.env.SMTP_HOST ?? "",
   smtpPort: Number(process.env.SMTP_PORT ?? 587),
   smtpUser: process.env.SMTP_USER ?? "",
@@ -30,8 +35,14 @@ export const env = {
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY ?? "",
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
-  get emailEnabled() {
+  get resendEnabled() {
+    return Boolean(this.resendApiKey);
+  },
+  get smtpEnabled() {
     return Boolean(this.smtpHost && this.smtpUser && this.smtpPass);
+  },
+  get emailEnabled() {
+    return this.resendEnabled || this.smtpEnabled;
   },
   get turnstileEnabled() {
     return Boolean(this.turnstileSecret);

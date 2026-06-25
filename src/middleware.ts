@@ -26,6 +26,9 @@ export function middleware(request: NextRequest) {
   const isAdminHost = isAdminHostname(hostname);
   const adminSiteUrl = getAdminSiteUrl();
   const resolvedPathname = resolveAdminPathname(pathname, isAdminHost);
+  const hasAuth = Boolean(request.cookies.get(AUTH_COOKIE)?.value);
+  const inAdminArea = isAdminAreaPath(pathname, isAdminHost);
+  const isPublicAdminPage = isPublicAdminPath(pathname, isAdminHost);
 
   if (!isAdminHost && pathname.startsWith("/admin")) {
     if (adminSiteUrl) {
@@ -39,12 +42,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (isAdminHost && shouldMapAdminHostname(pathname)) {
-    const rewriteUrl = request.nextUrl.clone();
-    rewriteUrl.pathname = toInternalAdminPath(pathname);
-    return NextResponse.rewrite(rewriteUrl);
-  }
-
   if (
     !isAdminHost &&
     isComingSoonEnabled() &&
@@ -52,10 +49,6 @@ export function middleware(request: NextRequest) {
   ) {
     return NextResponse.redirect(new URL("/coming-soon", request.url));
   }
-
-  const hasAuth = Boolean(request.cookies.get(AUTH_COOKIE)?.value);
-  const inAdminArea = isAdminAreaPath(pathname, isAdminHost);
-  const isPublicAdminPage = isPublicAdminPath(pathname, isAdminHost);
 
   if (inAdminArea && !isPublicAdminPage && !hasAuth) {
     const loginUrl = new URL(getAdminLoginPath(isAdminHost), request.url);
@@ -69,6 +62,12 @@ export function middleware(request: NextRequest) {
   const loginPath = getAdminLoginPath(isAdminHost);
   if (pathname === loginPath && hasAuth) {
     return NextResponse.redirect(new URL(getAdminDashboardPath(isAdminHost), request.url));
+  }
+
+  if (isAdminHost && shouldMapAdminHostname(pathname)) {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = toInternalAdminPath(pathname);
+    return NextResponse.rewrite(rewriteUrl);
   }
 
   return NextResponse.next();

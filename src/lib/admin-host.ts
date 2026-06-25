@@ -30,9 +30,21 @@ export function getAdminHostname() {
 
 export function isAdminHostname(hostname: string) {
   const adminHost = getAdminHostname();
-  if (!adminHost) return false;
+  if (adminHost && hostname === adminHost) {
+    return true;
+  }
 
-  return hostname === adminHost;
+  const publicSiteUrl = getPublicSiteUrl();
+  if (!publicSiteUrl) {
+    return false;
+  }
+
+  try {
+    const publicHost = new URL(publicSiteUrl).hostname.replace(/^www\./, "");
+    return hostname === `admin.${publicHost}`;
+  } catch {
+    return false;
+  }
 }
 
 export function toInternalAdminPath(pathname: string) {

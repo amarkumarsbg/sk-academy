@@ -65,13 +65,19 @@ export function setAuthCookie(res: Response, token: string) {
 
 export function clearAuthCookie(res: Response) {
   const domain = getSharedCookieDomain();
-
-  res.clearCookie(COOKIE_NAME, {
-    path: "/",
+  const options = {
+    httpOnly: true,
     secure: env.isProduction,
-    sameSite: "lax",
-    ...(domain ? { domain } : {}),
-  });
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 0,
+  };
+
+  // Clear host-only cookies (older sessions) and shared-domain cookies.
+  res.clearCookie(COOKIE_NAME, options);
+  if (domain) {
+    res.clearCookie(COOKIE_NAME, { ...options, domain });
+  }
 }
 
 export function authRequired(req: Request, _res: Response, next: NextFunction) {

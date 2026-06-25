@@ -129,8 +129,11 @@ export function AdminSidebar() {
           className="w-full justify-start gap-3"
           onClick={async (e) => {
             e.preventDefault();
-            await logout();
-            window.location.href = loginPath;
+            try {
+              await logout();
+            } finally {
+              window.location.href = loginPath;
+            }
           }}
         >
           <LogOut className="h-4 w-4" />
@@ -242,8 +245,11 @@ export function AdminHeader({ title, subtitle, welcome = false }: AdminHeaderPro
           <DropdownMenuItem
             variant="destructive"
             onClick={async () => {
-              await logout();
-              window.location.href = loginPath;
+              try {
+                await logout();
+              } finally {
+                window.location.href = loginPath;
+              }
             }}
           >
             <LogOut className="h-4 w-4" />

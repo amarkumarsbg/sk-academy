@@ -27,10 +27,16 @@ export function middleware(request: NextRequest) {
   const adminSiteUrl = getAdminSiteUrl();
   const resolvedPathname = resolveAdminPathname(pathname, isAdminHost);
 
-  if (!isAdminHost && adminSiteUrl && pathname.startsWith("/admin")) {
-    const redirectUrl = new URL(toAdminPublicPath(pathname), adminSiteUrl);
-    redirectUrl.search = request.nextUrl.search;
-    return NextResponse.redirect(redirectUrl);
+  if (!isAdminHost && pathname.startsWith("/admin")) {
+    if (adminSiteUrl) {
+      const redirectUrl = new URL(toAdminPublicPath(pathname), adminSiteUrl);
+      redirectUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    if (isComingSoonEnabled()) {
+      return NextResponse.redirect(new URL("/coming-soon", request.url));
+    }
   }
 
   if (isAdminHost && shouldMapAdminHostname(pathname)) {
@@ -42,7 +48,7 @@ export function middleware(request: NextRequest) {
   if (
     !isAdminHost &&
     isComingSoonEnabled() &&
-    !isPublicPathAllowedDuringComingSoon(pathname, Boolean(adminSiteUrl))
+    !isPublicPathAllowedDuringComingSoon(pathname)
   ) {
     return NextResponse.redirect(new URL("/coming-soon", request.url));
   }
@@ -53,7 +59,10 @@ export function middleware(request: NextRequest) {
 
   if (inAdminArea && !isPublicAdminPage && !hasAuth) {
     const loginUrl = new URL(getAdminLoginPath(isAdminHost), request.url);
-    loginUrl.searchParams.set("next", isAdminHost ? toAdminPublicPath(resolvedPathname) : resolvedPathname);
+    loginUrl.searchParams.set(
+      "next",
+      isAdminHost ? toAdminPublicPath(resolvedPathname) : resolvedPathname
+    );
     return NextResponse.redirect(loginUrl);
   }
 

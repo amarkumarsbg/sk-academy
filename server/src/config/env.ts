@@ -16,6 +16,7 @@ export const env = {
   jwtSecret: required("JWT_SECRET"),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "7d",
   clientUrl: (process.env.CLIENT_URL ?? "http://localhost:3000").replace(/\/$/, ""),
+  adminUrl: (process.env.ADMIN_URL ?? "").replace(/\/$/, ""),
   uploadDir: process.env.UPLOAD_DIR ?? "uploads",
   adminEmail: process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",
@@ -49,5 +50,20 @@ export const env = {
   },
   get cloudinaryEnabled() {
     return Boolean(this.cloudinaryCloudName && this.cloudinaryApiKey && this.cloudinaryApiSecret);
+  },
+  get allowedOrigins() {
+    return [...new Set([this.clientUrl, this.adminUrl].filter(Boolean))];
+  },
+  get adminPortalUrl() {
+    return this.adminUrl || this.clientUrl;
+  },
+  adminInboxPath() {
+    return this.adminUrl ? "/inbox" : "/admin/inbox";
+  },
+  adminResetPasswordPath(token: string) {
+    const path = this.adminUrl
+      ? `/reset-password?token=${token}`
+      : `/admin/reset-password?token=${token}`;
+    return `${this.adminPortalUrl}${path}`;
   },
 };

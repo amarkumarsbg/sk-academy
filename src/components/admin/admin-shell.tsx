@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   Award,
@@ -28,6 +27,7 @@ import {
 import { adminNav, siteConfig } from "@/lib/config";
 import { logout } from "@/lib/api";
 import { getInitials, useCurrentUser } from "@/hooks/use-current-user";
+import { useAdminLoginPath, useAdminNavItem, usePublicSiteUrl } from "@/hooks/use-admin-host";
 import { SchoolLogo } from "@/components/public/school-logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,13 +66,42 @@ const iconMap: Record<string, LucideIcon> = {
   UserCog,
 };
 
+function AdminNavLink({
+  item,
+  onNavigate,
+}: {
+  item: (typeof adminNav)[number];
+  onNavigate?: () => void;
+}) {
+  const { href, isActive } = useAdminNavItem(item.href);
+  const Icon = iconMap[item.icon];
+
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        isActive
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      )}
+    >
+      {Icon && <Icon className="h-4 w-4 shrink-0" />}
+      {item.label}
+    </Link>
+  );
+}
+
 export function AdminSidebar() {
-  const pathname = usePathname();
+  const publicSiteUrl = usePublicSiteUrl();
+  const loginPath = useAdminLoginPath();
+  const dashboardHref = useAdminNavItem("/admin").href;
 
   return (
     <aside className="hidden h-dvh w-64 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground md:flex">
       <div className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
-        <SchoolLogo size="xs" href="/admin" />
+        <SchoolLogo size="xs" href={dashboardHref} />
         <div>
           <p className="text-sm font-semibold">{siteConfig.name}</p>
           <p className="text-xs text-muted-foreground">Admin Portal</p>
@@ -80,34 +109,14 @@ export function AdminSidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {adminNav.map((item) => {
-          const Icon = iconMap[item.icon];
-          const isActive =
-            item.href === "/admin"
-              ? pathname === "/admin"
-              : pathname.startsWith(item.href);
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              )}
-            >
-              {Icon && <Icon className="h-4 w-4 shrink-0" />}
-              {item.label}
-            </Link>
-          );
-        })}
+        {adminNav.map((item) => (
+          <AdminNavLink key={item.href} item={item} />
+        ))}
       </nav>
 
       <div className="shrink-0 space-y-1 border-t p-3">
         <ButtonLink
-          href="/"
+          href={publicSiteUrl}
           variant="ghost"
           className="w-full justify-start gap-3 text-muted-foreground"
         >
@@ -115,13 +124,13 @@ export function AdminSidebar() {
           Back to Website
         </ButtonLink>
         <ButtonLink
-          href="/admin/login"
+          href={loginPath}
           variant="outline"
           className="w-full justify-start gap-3"
           onClick={async (e) => {
             e.preventDefault();
             await logout();
-            window.location.href = "/admin/login";
+            window.location.href = loginPath;
           }}
         >
           <LogOut className="h-4 w-4" />
@@ -133,8 +142,9 @@ export function AdminSidebar() {
 }
 
 export function AdminMobileNav() {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const publicSiteUrl = usePublicSiteUrl();
+  const dashboardHref = useAdminNavItem("/admin").href;
 
   return (
     <div className="flex shrink-0 items-center gap-2 border-b bg-background p-2 md:hidden">
@@ -146,39 +156,18 @@ export function AdminMobileNav() {
         <SheetContent side="left" className="w-[min(100vw-2rem,18rem)] p-0">
           <SheetHeader className="border-b px-4 py-4 text-left">
             <SheetTitle className="flex items-center gap-2">
-              <SchoolLogo size="xs" href="/admin" />
+              <SchoolLogo size="xs" href={dashboardHref} />
               {siteConfig.name}
             </SheetTitle>
           </SheetHeader>
           <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-            {adminNav.map((item) => {
-              const Icon = iconMap[item.icon];
-              const isActive =
-                item.href === "/admin"
-                  ? pathname === "/admin"
-                  : pathname.startsWith(item.href);
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
-                >
-                  {Icon && <Icon className="h-4 w-4 shrink-0" />}
-                  {item.label}
-                </Link>
-              );
-            })}
+            {adminNav.map((item) => (
+              <AdminNavLink key={item.href} item={item} onNavigate={() => setOpen(false)} />
+            ))}
           </nav>
           <div className="space-y-1 border-t p-3">
             <ButtonLink
-              href="/"
+              href={publicSiteUrl}
               variant="ghost"
               className="w-full justify-start gap-3 text-muted-foreground"
               onClick={() => setOpen(false)}
@@ -191,25 +180,9 @@ export function AdminMobileNav() {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-        {adminNav.slice(0, 4).map((item) => {
-          const isActive =
-            item.href === "/admin"
-              ? pathname === "/admin"
-              : pathname.startsWith(item.href);
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "shrink-0 rounded-md px-3 py-1.5 text-xs font-medium",
-                isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-              )}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+        {adminNav.slice(0, 4).map((item) => (
+          <AdminNavLink key={item.href} item={item} />
+        ))}
       </div>
     </div>
   );
@@ -223,6 +196,8 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ title, subtitle, welcome = false }: AdminHeaderProps) {
   const { user } = useCurrentUser();
+  const publicSiteUrl = usePublicSiteUrl();
+  const loginPath = useAdminLoginPath();
   const displayName = user?.name ?? "Admin";
   const displayEmail = user?.email ?? "admin@skacademy.edu";
   const roleLabel = user?.role === "admin" ? "Administrator" : "Staff";
@@ -259,7 +234,7 @@ export function AdminHeader({ title, subtitle, welcome = false }: AdminHeaderPro
             <p className="text-xs text-muted-foreground">{displayEmail}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem render={<Link href="/" className="flex items-center gap-2" />}>
+          <DropdownMenuItem render={<Link href={publicSiteUrl} className="flex items-center gap-2" />}>
             <Home className="h-4 w-4" />
             Back to Website
           </DropdownMenuItem>
@@ -268,7 +243,7 @@ export function AdminHeader({ title, subtitle, welcome = false }: AdminHeaderPro
             variant="destructive"
             onClick={async () => {
               await logout();
-              window.location.href = "/admin/login";
+              window.location.href = loginPath;
             }}
           >
             <LogOut className="h-4 w-4" />

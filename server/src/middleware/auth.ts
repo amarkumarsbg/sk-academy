@@ -21,6 +21,25 @@ declare global {
 
 const COOKIE_NAME = "sk_auth";
 
+function getSharedCookieDomain() {
+  if (!env.isProduction) return undefined;
+
+  try {
+    const clientHost = new URL(env.clientUrl).hostname;
+    const adminHost = env.adminUrl ? new URL(env.adminUrl).hostname : clientHost;
+    const clientRoot = clientHost.split(".").slice(-2).join(".");
+    const adminRoot = adminHost.split(".").slice(-2).join(".");
+
+    if (clientRoot && clientRoot === adminRoot && clientHost !== adminHost) {
+      return `.${clientRoot}`;
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
+
 export function getAuthCookieName() {
   return COOKIE_NAME;
 }
@@ -32,20 +51,26 @@ export function signToken(payload: AuthPayload) {
 }
 
 export function setAuthCookie(res: Response, token: string) {
+  const domain = getSharedCookieDomain();
+
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: env.isProduction,
     sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
+    ...(domain ? { domain } : {}),
   });
 }
 
 export function clearAuthCookie(res: Response) {
+  const domain = getSharedCookieDomain();
+
   res.clearCookie(COOKIE_NAME, {
     path: "/",
     secure: env.isProduction,
     sameSite: "lax",
+    ...(domain ? { domain } : {}),
   });
 }
 

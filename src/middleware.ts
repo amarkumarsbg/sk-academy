@@ -1,31 +1,65 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  getAdminDashboardPath,
+  getAdminLoginPath,
+  getAdminSiteUrl,
+  isAdminAreaPath,
+  isAdminHostname,
+  isPublicAdminPath,
+  resolveAdminPathname,
+  shouldMapAdminHostname,
+  toAdminPublicPath,
+  toInternalAdminPath,
+} from "@/lib/admin-host";
 import { isComingSoonEnabled, isPublicPathAllowedDuringComingSoon } from "@/lib/coming-soon";
 
 const AUTH_COOKIE = "sk_auth";
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+function getHostname(request: NextRequest) {
+  return request.headers.get("host")?.split(":")[0] ?? "";
+}
 
-  if (isComingSoonEnabled() && !isPublicPathAllowedDuringComingSoon(pathname)) {
+export function middleware(request: NextRequest) {
+  const hostname = getHostname(request);
+  const { pathname } = request.nextUrl;
+  const isAdminHost = isAdminHostname(hostname);
+  const adminSiteUrl = getAdminSiteUrl();
+  const resolvedPathname = resolveAdminPathname(pathname, isAdminHost);
+
+  if (!isAdminHost && adminSiteUrl && pathname.startsWith("/admin")) {
+    const redirectUrl = new URL(toAdminPublicPath(pathname), adminSiteUrl);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  if (isAdminHost && shouldMapAdminHostname(pathname)) {
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = toInternalAdminPath(pathname);
+    return NextResponse.rewrite(rewriteUrl);
+  }
+
+  if (
+    !isAdminHost &&
+    isComingSoonEnabled() &&
+    !isPublicPathAllowedDuringComingSoon(pathname, Boolean(adminSiteUrl))
+  ) {
     return NextResponse.redirect(new URL("/coming-soon", request.url));
   }
 
   const hasAuth = Boolean(request.cookies.get(AUTH_COOKIE)?.value);
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isPublicAdminPage =
-    pathname === "/admin/login" ||
-    pathname === "/admin/forgot-password" ||
-    pathname.startsWith("/admin/reset-password");
+  const inAdminArea = isAdminAreaPath(pathname, isAdminHost);
+  const isPublicAdminPage = isPublicAdminPath(pathname, isAdminHost);
 
-  if (isAdminRoute && !isPublicAdminPage && !hasAuth) {
-    const loginUrl = new URL("/admin/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+  if (inAdminArea && !isPublicAdminPage && !hasAuth) {
+    const loginUrl = new URL(getAdminLoginPath(isAdminHost), request.url);
+    loginUrl.searchParams.set("next", isAdminHost ? toAdminPublicPath(resolvedPathname) : resolvedPathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname === "/admin/login" && hasAuth) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+  const loginPath = getAdminLoginPath(isAdminHost);
+  if (pathname === loginPath && hasAuth) {
+    return NextResponse.redirect(new URL(getAdminDashboardPath(isAdminHost), request.url));
   }
 
   return NextResponse.next();

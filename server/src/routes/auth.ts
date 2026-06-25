@@ -97,7 +97,7 @@ authRouter.post(
         token,
         expiresAt: new Date(Date.now() + 60 * 60 * 1000),
       });
-      const resetUrl = `${env.clientUrl}/admin/reset-password?token=${token}`;
+      const resetUrl = env.adminResetPasswordPath(token);
       await sendPasswordResetEmail(user.email, resetUrl);
     }
 

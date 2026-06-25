@@ -130,9 +130,12 @@ CLIENT_URL=https://sk-academy.vercel.app
 ```env
 API_URL=https://sk-academy-api.onrender.com
 CLIENT_URL=https://skacademy.net
+NEXT_PUBLIC_SITE_URL=https://skacademy.net
+ADMIN_URL=https://admin.skacademy.net
+NEXT_PUBLIC_ADMIN_URL=https://admin.skacademy.net
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=   # optional
 
-# Until go-live — visitors see /coming-soon; staff can still use /admin
+# Until go-live — visitors see /coming-soon; staff use admin.skacademy.net
 COMING_SOON=true
 COMING_SOON_LAUNCH_DATE=2026-07-01
 ```
@@ -145,7 +148,8 @@ PORT=4000                    # Render sets this automatically
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=long-random-secret
 JWT_EXPIRES_IN=7d
-CLIENT_URL=https://your-app.vercel.app
+CLIENT_URL=https://skacademy.net
+ADMIN_URL=https://admin.skacademy.net
 UPLOAD_DIR=uploads
 ADMIN_EMAIL=admin@skacademy.edu
 ADMIN_PASSWORD=your-secure-password
@@ -200,10 +204,25 @@ CLOUDINARY_API_SECRET=
 
 ### Coming soon mode (pre-launch)
 - Set `COMING_SOON=true` on **Vercel Production** while the site is not ready for the public.
-- Visitors to `skacademy.net` are redirected to a launch page showing **1 July 2026** (or set `COMING_SOON_LAUNCH_DATE=2026-07-01`).
-- **Admin stays available** at `/admin` so you can keep editing CMS and testing.
+- Visitors to `skacademy.net` see the launch page.
+- **Staff admin** uses `https://admin.skacademy.net` (not `/admin` on the main domain).
 - Search engines are blocked via `robots.txt` and an empty sitemap while this is on.
 - On go-live day, set `COMING_SOON=false` (or remove the variable) and redeploy.
+
+### Admin subdomain
+1. In **Vercel → Domains**, add `admin.skacademy.net` to the same project.
+2. At your domain registrar, add the DNS record Vercel provides for `admin`.
+3. Set on **Vercel**:
+   - `ADMIN_URL=https://admin.skacademy.net`
+   - `NEXT_PUBLIC_ADMIN_URL=https://admin.skacademy.net`
+   - `NEXT_PUBLIC_SITE_URL=https://skacademy.net`
+4. Set on **Render**:
+   - `ADMIN_URL=https://admin.skacademy.net`
+   - `CLIENT_URL=https://skacademy.net`
+5. Redeploy both services.
+
+Staff login: `https://admin.skacademy.net/login`  
+Visiting `skacademy.net/admin` redirects to the admin subdomain.
 
 ### Password reset
 - Requires SMTP on Render. Staff can use **Forgot password** on `/admin/login`.

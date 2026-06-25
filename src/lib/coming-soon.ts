@@ -15,10 +15,10 @@ export function formatLaunchDate(date: Date) {
   }).format(date);
 }
 
-export function isPublicPathAllowedDuringComingSoon(pathname: string) {
+export function isPublicPathAllowedDuringComingSoon(pathname: string, adminSubdomainEnabled = false) {
   return (
     pathname === "/coming-soon" ||
-    pathname.startsWith("/admin") ||
+    (!adminSubdomainEnabled && pathname.startsWith("/admin")) ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/uploads") ||
     pathname.startsWith("/_next")

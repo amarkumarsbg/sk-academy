@@ -11,12 +11,16 @@ import { Label } from "@/components/ui/label";
 import { SchoolLogo } from "@/components/public/school-logo";
 import { login } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
+import { useAdminHref, usePublicSiteUrl } from "@/hooks/use-admin-host";
 import { siteConfig } from "@/lib/config";
 
 export default function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/admin";
+  const forgotPasswordPath = useAdminHref("/admin/forgot-password");
+  const publicSiteUrl = usePublicSiteUrl();
+  const dashboardPath = useAdminHref("/admin");
+  const next = searchParams.get("next") ?? dashboardPath;
 
   const [email, setEmail] = useState("admin@skacademy.edu");
   const [password, setPassword] = useState("");
@@ -86,12 +90,12 @@ export default function AdminLoginForm() {
             Default: admin@skacademy.edu / admin1234 (after running seed)
           </p>
           <div className="mt-4 text-center">
-            <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
+            <Link href={forgotPasswordPath} className="text-sm text-primary hover:underline">
               Forgot password?
             </Link>
           </div>
           <div className="mt-2 text-center">
-            <Link href="/" className="text-sm text-primary hover:underline">
+            <Link href={publicSiteUrl} className="text-sm text-primary hover:underline">
               ← Back to website
             </Link>
           </div>

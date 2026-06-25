@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { fetchSiteContent } from "@/lib/api";
+import { isComingSoonEnabled } from "@/lib/coming-soon";
 import { mergeStoredSiteContent } from "@/lib/merge-site-content";
 
 const staticRoutes = [
@@ -16,6 +17,10 @@ const staticRoutes = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (isComingSoonEnabled()) {
+    return [];
+  }
+
   const baseUrl = (
     process.env.CLIENT_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")

@@ -129,8 +129,12 @@ CLIENT_URL=https://sk-academy.vercel.app
 
 ```env
 API_URL=https://sk-academy-api.onrender.com
-CLIENT_URL=https://your-app.vercel.app
+CLIENT_URL=https://skacademy.net
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=   # optional
+
+# Until go-live — visitors see /coming-soon; staff can still use /admin
+COMING_SOON=true
+COMING_SOON_LAUNCH_DATE=2026-07-01
 ```
 
 ### Render (`server/`)
@@ -193,6 +197,13 @@ CLOUDINARY_API_SECRET=
 - Create keys at [Cloudflare Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile).
 - Render: `TURNSTILE_SECRET_KEY`
 - Vercel: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+
+### Coming soon mode (pre-launch)
+- Set `COMING_SOON=true` on **Vercel Production** while the site is not ready for the public.
+- Visitors to `skacademy.net` are redirected to a launch page showing **1 July 2026** (or set `COMING_SOON_LAUNCH_DATE=2026-07-01`).
+- **Admin stays available** at `/admin` so you can keep editing CMS and testing.
+- Search engines are blocked via `robots.txt` and an empty sitemap while this is on.
+- On go-live day, set `COMING_SOON=false` (or remove the variable) and redeploy.
 
 ### Password reset
 - Requires SMTP on Render. Staff can use **Forgot password** on `/admin/login`.

@@ -46,6 +46,7 @@ export async function resetPassword(token: string, password: string) {
 export async function submitContact(data: {
   name: string;
   email: string;
+  phone: string;
   message: string;
   captchaToken?: string;
 }) {
@@ -74,6 +75,7 @@ export interface ContactMessageRecord {
   _id: string;
   name: string;
   email: string;
+  phone?: string;
   message: string;
   status: InboxStatus;
   notes?: string;

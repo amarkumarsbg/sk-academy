@@ -74,12 +74,14 @@ export async function sendEmail(options: {
 export async function notifyNewContactMessage(data: {
   name: string;
   email: string;
+  phone?: string;
   message: string;
 }) {
   try {
     await sendEmail({
+      to: env.notifyEmail,
       subject: `[SK Academy] New contact message from ${data.name}`,
-      text: `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}\n\nView in admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
+      text: `Name: ${data.name}\nEmail: ${data.email}${data.phone ? `\nPhone: ${data.phone}` : ""}\n\nMessage:\n${data.message}\n\nView in admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
     });
   } catch (err) {
     console.error("[email failed] contact notification:", err);
@@ -94,6 +96,7 @@ export async function notifyNewAdmissionInquiry(data: {
 }) {
   try {
     await sendEmail({
+      to: env.notifyEmail,
       subject: `[SK Academy] New admission inquiry — ${data.name}`,
       text: `Student/Parent: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nGrade: ${data.grade}\n\nView in admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
     });

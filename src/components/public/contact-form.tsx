@@ -16,6 +16,7 @@ type FormState = "idle" | "success" | "error";
 type FormValues = {
   name: string;
   email: string;
+  phone: string;
   message: string;
 };
 
@@ -34,6 +35,12 @@ function validate(values: FormValues): FormErrors {
     errors.email = "Please enter a valid email address.";
   }
 
+  if (!values.phone.trim()) {
+    errors.phone = "Please enter your phone number.";
+  } else if (values.phone.replace(/\D/g, "").length < 10) {
+    errors.phone = "Please enter a valid phone number.";
+  }
+
   if (!values.message.trim()) {
     errors.message = "Please enter your message.";
   } else if (values.message.trim().length < 10) {
@@ -44,7 +51,7 @@ function validate(values: FormValues): FormErrors {
 }
 
 export function ContactForm() {
-  const [values, setValues] = useState<FormValues>({ name: "", email: "", message: "" });
+  const [values, setValues] = useState<FormValues>({ name: "", email: "", phone: "", message: "" });
   const [errors, setErrors] = useState<FormErrors>({});
   const [state, setState] = useState<FormState>("idle");
   const [submitting, setSubmitting] = useState(false);
@@ -87,7 +94,7 @@ export function ContactForm() {
             variant="outline"
             className="mt-4"
             onClick={() => {
-              setValues({ name: "", email: "", message: "" });
+              setValues({ name: "", email: "", phone: "", message: "" });
               setState("idle");
             }}
           >
@@ -125,6 +132,19 @@ export function ContactForm() {
               aria-invalid={Boolean(errors.email)}
             />
             {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact-phone">Phone Number</Label>
+            <Input
+              id="contact-phone"
+              type="tel"
+              value={values.phone}
+              onChange={(e) => setValues((prev) => ({ ...prev, phone: e.target.value }))}
+              placeholder="+91 98765 43210"
+              aria-invalid={Boolean(errors.phone)}
+            />
+            {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
           </div>
 
           <div className="space-y-2">

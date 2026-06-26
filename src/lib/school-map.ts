@@ -1,5 +1,5 @@
 /** Kahalgaon / Bhagalpur area shown in the site footer map. */
-export const SCHOOL_MAP_PLACE = "Kahalgaon, Bhagalpur, Bihar, India";
+export const SCHOOL_MAP_PLACE = "Kahalgaon, Bhagalpur, Bihar - 813203, India";
 
 export const SCHOOL_MAP_CENTER: [number, number] = [25.19, 87.24];
 

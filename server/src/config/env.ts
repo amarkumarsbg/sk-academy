@@ -21,7 +21,7 @@ export const env = {
   adminEmail: process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",
   isProduction: process.env.NODE_ENV === "production",
-  notifyEmail: process.env.NOTIFY_EMAIL ?? process.env.ADMIN_EMAIL ?? "admin@skacademy.edu",
+  notifyEmail: process.env.NOTIFY_EMAIL ?? "info@skacademy.net",
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   resendFrom:
     process.env.RESEND_FROM ??

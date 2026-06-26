@@ -130,6 +130,14 @@ export function InboxPageContent() {
                             {message.email}
                           </a>
                         </span>
+                        {message.phone && (
+                          <span className="inline-flex items-center gap-1">
+                            <Phone className="h-4 w-4" />
+                            <a href={`tel:${message.phone}`} className="hover:text-primary">
+                              {message.phone}
+                            </a>
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm leading-relaxed">{message.message}</p>
                       <div className="flex flex-wrap items-end gap-3">

@@ -9,6 +9,15 @@ import { SectionHeading } from "@/components/public/section-heading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSiteContent } from "@/context/site-content-provider";
 
+function formatPhone(phone: string) {
+  if (!phone) return "";
+  const cleaned = phone.replace(/\s+/g, "");
+  if (cleaned.startsWith("+91") && cleaned.length === 13) {
+    return `+91 ${cleaned.slice(3, 8)} ${cleaned.slice(8)}`;
+  }
+  return phone;
+}
+
 export function ContactPageContent() {
   const { content } = useSiteContent();
   const { contact, settings } = content;
@@ -23,7 +32,7 @@ export function ContactPageContent() {
             <div className="mt-8 space-y-7">
               {[
                 { icon: MapPin, label: "Address", value: settings.address },
-                { icon: Phone, label: "Phone", value: settings.phone },
+                { icon: Phone, label: "Phone", value: formatPhone(settings.phone) || settings.phone },
                 { icon: Mail, label: "Email", value: settings.email },
               ].map((item) => (
                 <div key={item.label} className="flex gap-5">

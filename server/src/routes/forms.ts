@@ -14,6 +14,7 @@ import { writeAuditLog } from "../services/auditLog.js";
 const contactSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
+  phone: z.string().min(10),
   message: z.string().min(10),
   captchaToken: z.string().optional(),
 });
@@ -41,9 +42,10 @@ formsRouter.post(
     const message = await ContactMessage.create({
       name: data.name,
       email: data.email,
+      phone: data.phone,
       message: data.message,
     });
-    await notifyNewContactMessage({ name: data.name, email: data.email, message: data.message });
+    await notifyNewContactMessage({ name: data.name, email: data.email, phone: data.phone, message: data.message });
     res.status(201).json({ id: message._id, success: true });
   })
 );

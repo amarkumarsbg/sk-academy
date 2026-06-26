@@ -155,7 +155,7 @@ ADMIN_EMAIL=admin@skacademy.edu
 ADMIN_PASSWORD=your-secure-password
 
 # Optional — email + password reset (Resend recommended)
-NOTIFY_EMAIL=admissions@skacademy.edu
+NOTIFY_EMAIL=info@skacademy.net
 RESEND_API_KEY=re_xxxxxxxx
 RESEND_FROM="SK Academy <noreply@yourdomain.com>"
 
@@ -194,7 +194,7 @@ CLOUDINARY_API_SECRET=
   - For testing, use `onboarding@resend.dev` as the from address.
   - For production, verify your domain in Resend and use e.g. `noreply@yourdomain.com`.
 - **SMTP fallback:** if `RESEND_API_KEY` is not set, the server uses `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM`.
-- Set `NOTIFY_EMAIL` to receive contact/admission form alerts.
+- Set `NOTIFY_EMAIL=info@skacademy.net` on Render to receive contact/admission form alerts.
 - Forms still save to the admin **Inbox** without email configured.
 
 ### CAPTCHA (optional)

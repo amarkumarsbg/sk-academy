@@ -154,17 +154,19 @@ UPLOAD_DIR=uploads
 ADMIN_EMAIL=admin@skacademy.edu
 ADMIN_PASSWORD=your-secure-password
 
-# Optional — email + password reset (Resend recommended)
+# Optional — email + password reset
 NOTIFY_EMAIL=info@skacademy.net
-RESEND_API_KEY=re_xxxxxxxx
-RESEND_FROM="SK Academy <noreply@yourdomain.com>"
 
-# SMTP fallback (only if RESEND_API_KEY is not set)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-SMTP_FROM="SK Academy <noreply@skacademy.edu>"
+# Resend (optional) — verify skacademy.net at resend.com/domains first
+RESEND_API_KEY=re_xxxxxxxx
+RESEND_FROM="SK Academy <noreply@skacademy.net>"
+
+# GoDaddy Titan SMTP — delivers form alerts to info@skacademy.net (used when Resend cannot)
+SMTP_HOST=smtpout.secureserver.net
+SMTP_PORT=465
+SMTP_USER=info@skacademy.net
+SMTP_PASS=your-titan-email-password
+SMTP_FROM="SK Academy <info@skacademy.net>"
 
 # Optional — CAPTCHA
 TURNSTILE_SECRET_KEY=
@@ -189,12 +191,11 @@ CLOUDINARY_API_SECRET=
 - Without Cloudinary, uploads use Render’s local disk and **may be lost on redeploy**.
 
 ### Email notifications
-- **Resend (recommended):** set `RESEND_API_KEY` and `RESEND_FROM` on Render.
-  - Create an API key at [resend.com](https://resend.com).
-  - For testing, use `onboarding@resend.dev` as the from address.
-  - For production, verify your domain in Resend and use e.g. `noreply@yourdomain.com`.
-- **SMTP fallback:** if `RESEND_API_KEY` is not set, the server uses `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM`.
-- Set `NOTIFY_EMAIL=info@skacademy.net` on Render to receive contact/admission form alerts.
+- Form alerts go to `NOTIFY_EMAIL` (set to `info@skacademy.net`).
+- **GoDaddy Titan SMTP (recommended):** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM` on Render using your `info@skacademy.net` mailbox password.
+  - Host: `smtpout.secureserver.net`, Port: `465`, SSL.
+- **Resend (optional):** verify `skacademy.net` at [resend.com/domains](https://resend.com/domains), then set `RESEND_API_KEY` and `RESEND_FROM`. If Resend cannot deliver, the server falls back to SMTP automatically.
+- Test locally: `cd server && npm run test:email`
 - Forms still save to the admin **Inbox** without email configured.
 
 ### CAPTCHA (optional)

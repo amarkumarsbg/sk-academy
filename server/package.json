@@ -10,7 +10,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "seed": "tsx src/scripts/seed.ts"
+    "seed": "tsx src/scripts/seed.ts",
+    "test:email": "node scripts/test-email.mjs"
   },
   "dependencies": {
     "@types/nodemailer": "^8.0.1",

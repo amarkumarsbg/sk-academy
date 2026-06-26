@@ -9,6 +9,8 @@ function getTransporter() {
   if (!env.smtpEnabled) return null;
   if (!transporter) {
     transporter = nodemailer.createTransport({
+      pool: true,
+      maxConnections: 3,
       host: env.smtpHost,
       port: env.smtpPort,
       secure: env.smtpPort === 465,
@@ -26,83 +28,185 @@ function getResend() {
   return resend;
 }
 
+export async function warmUpEmailTransport() {
+  const transport = getTransporter();
+  if (!transport) return;
+  try {
+    await transport.verify();
+    console.log("[email] SMTP connection ready");
+  } catch (err) {
+    console.warn("[email] SMTP warm-up failed:", err instanceof Error ? err.message : err);
+  }
+}
+
+async function sendViaResend(options: {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  text: string;
+  html: string;
+}) {
+  const resendClient = getResend();
+  if (!resendClient) return false;
+
+  const { error } = await resendClient.emails.send({
+    from: options.from,
+    to: [options.to],
+    replyTo: options.replyTo,
+    subject: options.subject,
+    text: options.text,
+    html: options.html,
+  });
+
+  if (error) {
+    console.warn(`[email] Resend failed (${error.message})`);
+    return false;
+  }
+
+  console.log(`[email sent] to ${options.to} via Resend — ${options.subject}`);
+  return true;
+}
+
+async function sendViaSmtp(options: {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  text: string;
+  html: string;
+}) {
+  const transport = getTransporter();
+  if (!transport) return false;
+
+  await transport.sendMail({
+    from: options.from,
+    to: options.to,
+    replyTo: options.replyTo,
+    subject: options.subject,
+    text: options.text,
+    html: options.html,
+  });
+  console.log(`[email sent] to ${options.to} via SMTP — ${options.subject}`);
+  return true;
+}
+
 export async function sendEmail(options: {
   to?: string;
+  from?: string;
+  replyTo?: string;
   subject: string;
   text: string;
   html?: string;
 }) {
-  if (!env.emailEnabled) {
-    console.log(`[email skipped] ${options.subject}`);
-    return;
-  }
-
   const to = options.to ?? env.notifyEmail;
+  const from = options.from ?? env.mailFrom;
   const html = options.html ?? options.text.replace(/\n/g, "<br>");
 
-  const resendClient = getResend();
-  if (resendClient) {
-    const { error } = await resendClient.emails.send({
-      from: env.resendFrom,
-      to: [to],
-      subject: options.subject,
-      text: options.text,
-      html,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
+  if (!env.emailEnabled) {
+    console.log(`[email skipped] ${options.subject} (no email provider configured)`);
     return;
   }
 
-  const transport = getTransporter();
-  if (!transport) {
-    console.log(`[email skipped] ${options.subject}`);
-    return;
-  }
-
-  await transport.sendMail({
-    from: env.smtpFrom,
+  const payload = {
+    from,
     to,
+    replyTo: options.replyTo,
     subject: options.subject,
     text: options.text,
     html,
+  };
+
+  if (env.emailProvider === "smtp") {
+    if (await sendViaSmtp(payload)) return;
+    if (await sendViaResend({ ...payload, from: options.from ?? env.resendFrom })) return;
+  } else {
+    if (await sendViaResend({ ...payload, from: options.from ?? env.resendFrom })) return;
+    if (await sendViaSmtp(payload)) return;
+  }
+
+  console.log(`[email skipped] ${options.subject} (all providers failed)`);
+}
+
+function formatReplyTo(name: string, email: string) {
+  const safeName = name.replace(/"/g, "'");
+  return `"${safeName}" <${email}>`;
+}
+
+function buildFormNotificationBody(data: {
+  intro: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  extraLines?: string[];
+}) {
+  const lines = [
+    data.intro,
+    "",
+    `From: ${data.name}`,
+    `Email: ${data.email}`,
+    data.phone ? `Phone: ${data.phone}` : "",
+    ...(data.extraLines ?? []),
+    data.message !== undefined ? "" : null,
+    data.message !== undefined ? "Message:" : null,
+    data.message,
+    "",
+    "—",
+    `Hit Reply in your mail app to respond directly to ${data.name} at ${data.email}.`,
+    `Admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
+  ].filter((line): line is string => line !== null && line !== "");
+
+  return lines.join("\n");
+}
+
+function queueFormEmail(task: () => Promise<void>) {
+  void task().catch((err) => {
+    console.error("[email failed] form notification:", err);
   });
 }
 
-export async function notifyNewContactMessage(data: {
+export function notifyNewContactMessage(data: {
   name: string;
   email: string;
   phone?: string;
   message: string;
 }) {
-  try {
-    await sendEmail({
+  queueFormEmail(() =>
+    sendEmail({
       to: env.notifyEmail,
-      subject: `[SK Academy] New contact message from ${data.name}`,
-      text: `Name: ${data.name}\nEmail: ${data.email}${data.phone ? `\nPhone: ${data.phone}` : ""}\n\nMessage:\n${data.message}\n\nView in admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
-    });
-  } catch (err) {
-    console.error("[email failed] contact notification:", err);
-  }
+      from: env.mailFrom,
+      replyTo: formatReplyTo(data.name, data.email),
+      subject: `Website contact: ${data.name}`,
+      text: buildFormNotificationBody({
+        intro: "Someone submitted the contact form on skacademy.net",
+        ...data,
+      }),
+    })
+  );
 }
 
-export async function notifyNewAdmissionInquiry(data: {
+export function notifyNewAdmissionInquiry(data: {
   name: string;
   phone: string;
   email: string;
   grade: string;
 }) {
-  try {
-    await sendEmail({
+  queueFormEmail(() =>
+    sendEmail({
       to: env.notifyEmail,
-      subject: `[SK Academy] New admission inquiry — ${data.name}`,
-      text: `Student/Parent: ${data.name}\nPhone: ${data.phone}\nEmail: ${data.email}\nGrade: ${data.grade}\n\nView in admin inbox: ${env.adminPortalUrl}${env.adminInboxPath()}`,
-    });
-  } catch (err) {
-    console.error("[email failed] admission notification:", err);
-  }
+      from: env.mailFrom,
+      replyTo: formatReplyTo(data.name, data.email),
+      subject: `Website admission inquiry: ${data.name}`,
+      text: buildFormNotificationBody({
+        intro: "Someone submitted an admission inquiry on skacademy.net",
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        extraLines: [`Grade: ${data.grade}`],
+      }),
+    })
+  );
 }
 
 export async function sendPasswordResetEmail(email: string, resetUrl: string) {

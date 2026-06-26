@@ -6,11 +6,13 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import { connectDb } from "./config/db.js";
 import { env } from "./config/env.js";
+import { warmUpEmailTransport } from "./services/email.js";
 import { apiRouter } from "./routes/index.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 async function main() {
   await connectDb();
+  void warmUpEmailTransport();
 
   const app = express();
 

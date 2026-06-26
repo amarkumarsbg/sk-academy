@@ -22,11 +22,16 @@ export const env = {
   adminPassword: process.env.ADMIN_PASSWORD ?? "admin1234",
   isProduction: process.env.NODE_ENV === "production",
   notifyEmail: process.env.NOTIFY_EMAIL ?? "info@skacademy.net",
+  mailFrom:
+    process.env.MAIL_FROM ??
+    process.env.SMTP_FROM ??
+    '"SK Academy Website" <noreply@skacademy.net>',
+  emailProvider: process.env.EMAIL_PROVIDER ?? (process.env.SMTP_HOST ? "smtp" : "resend"),
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   resendFrom:
     process.env.RESEND_FROM ??
-    process.env.SMTP_FROM ??
-    "SK Academy <onboarding@resend.dev>",
+    process.env.MAIL_FROM ??
+    '"SK Academy Website" <noreply@skacademy.net>',
   smtpHost: process.env.SMTP_HOST ?? "",
   smtpPort: Number(process.env.SMTP_PORT ?? 587),
   smtpUser: process.env.SMTP_USER ?? "",

@@ -45,7 +45,7 @@ formsRouter.post(
       phone: data.phone,
       message: data.message,
     });
-    await notifyNewContactMessage({ name: data.name, email: data.email, phone: data.phone, message: data.message });
+    notifyNewContactMessage({ name: data.name, email: data.email, phone: data.phone, message: data.message });
     res.status(201).json({ id: message._id, success: true });
   })
 );
@@ -92,7 +92,7 @@ formsRouter.post(
       email: data.email,
       grade: data.grade,
     });
-    await notifyNewAdmissionInquiry({
+    notifyNewAdmissionInquiry({
       name: data.name,
       phone: data.phone,
       email: data.email,

@@ -57,6 +57,17 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
+  const updateField = <K extends keyof FormValues>(key: K, value: FormValues[K]) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    setState("idle");
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate(values);
@@ -114,7 +125,7 @@ export function ContactForm() {
             <Input
               id="contact-name"
               value={values.name}
-              onChange={(e) => setValues((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => updateField("name", e.target.value)}
               placeholder="Your name"
               aria-invalid={Boolean(errors.name)}
             />
@@ -127,7 +138,7 @@ export function ContactForm() {
               id="contact-email"
               type="email"
               value={values.email}
-              onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))}
+              onChange={(e) => updateField("email", e.target.value)}
               placeholder="you@example.com"
               aria-invalid={Boolean(errors.email)}
             />
@@ -140,7 +151,7 @@ export function ContactForm() {
               id="contact-phone"
               type="tel"
               value={values.phone}
-              onChange={(e) => setValues((prev) => ({ ...prev, phone: e.target.value }))}
+              onChange={(e) => updateField("phone", e.target.value)}
               placeholder="+91 98765 43210"
               aria-invalid={Boolean(errors.phone)}
             />
@@ -153,18 +164,12 @@ export function ContactForm() {
               id="contact-message"
               rows={4}
               value={values.message}
-              onChange={(e) => setValues((prev) => ({ ...prev, message: e.target.value }))}
+              onChange={(e) => updateField("message", e.target.value)}
               placeholder="How can we help you?"
               aria-invalid={Boolean(errors.message)}
             />
             {errors.message && <p className="text-xs text-destructive">{errors.message}</p>}
           </div>
-
-          {state === "error" && Object.keys(errors).length > 0 && (
-            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-              Please fix the errors above and try again.
-            </p>
-          )}
 
           <TurnstileWidget onToken={setCaptchaToken} />
 

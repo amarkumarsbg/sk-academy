@@ -102,8 +102,7 @@ export function CmsPageShell({
   return (
     <>
       <AdminHeader title={title} />
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-28 sm:p-6 sm:pb-28">
+      <div className="p-4 pb-28 sm:p-6 sm:pb-28">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <Link
               href="/admin/cms"
@@ -124,15 +123,14 @@ export function CmsPageShell({
             )}
           </div>
           <div className="mx-auto max-w-3xl space-y-4">{children}</div>
-        </div>
-        <CmsStickyFooter
-          isDirty={isDirty}
-          saving={saving}
-          lastSavedAt={lastSavedAt}
-          onSave={handleSave}
-          onCancel={onCancel}
-        />
       </div>
+      <CmsStickyFooter
+        isDirty={isDirty}
+        saving={saving}
+        lastSavedAt={lastSavedAt}
+        onSave={handleSave}
+        onCancel={onCancel}
+      />
     </>
   );
 }

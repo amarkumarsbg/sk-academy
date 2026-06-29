@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
 import { Badge } from "@/components/ui/badge";
@@ -181,10 +182,18 @@ export function ResourceCrudPage<T extends { id: string }>({
       ? `No ${title.toLowerCase()} match your search or filters.`
       : `No ${title.toLowerCase()} records found.`);
 
+  const hasActiveFilters =
+    Boolean(search.trim()) || filters.some((f) => filterValues[f.key] !== "All");
+
+  function clearFilters() {
+    setSearch("");
+    setFilterValues(Object.fromEntries(filters.map((f) => [f.key, "All"])));
+  }
+
   return (
     <>
       <AdminHeader title={title} />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {loading ? <AdminLoadingText /> : `${items.length} records`}
@@ -196,7 +205,7 @@ export function ResourceCrudPage<T extends { id: string }>({
         </div>
 
         {(searchKeys.length > 0 || filters.length > 0) && (
-          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-col gap-3 border-b bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:flex-row lg:items-center">
             {searchKeys.length > 0 && (
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -209,7 +218,7 @@ export function ResourceCrudPage<T extends { id: string }>({
               </div>
             )}
             {filters.length > 0 && (
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+              <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                 {filters.map((filter) => (
                   <Select
                     key={filter.key}
@@ -231,6 +240,11 @@ export function ResourceCrudPage<T extends { id: string }>({
                     </SelectContent>
                   </Select>
                 ))}
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters}>
+                    Clear filters
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -243,13 +257,13 @@ export function ResourceCrudPage<T extends { id: string }>({
         ) : filtered.length > 0 ? (
           <AdminDataTable columns={tableColumns} data={filtered} />
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-              <p className="mb-4 text-sm text-muted-foreground">{emptyMessage}</p>
-              <Button size="sm" onClick={openCreate}>
-                <Plus className="mr-2 h-4 w-4" />
-                {addLabel}
-              </Button>
-            </div>
+          <AdminEmptyState
+            icon={Plus}
+            title={hasActiveFilters ? "No matching records" : `No ${title.toLowerCase()} yet`}
+            description={emptyMessage}
+            actionLabel={hasActiveFilters ? "Clear filters" : addLabel}
+            onAction={hasActiveFilters ? clearFilters : openCreate}
+          />
         )}
 
         <Dialog open={open} onOpenChange={setOpen}>

@@ -34,7 +34,7 @@ export default function CmsPage() {
   return (
     <>
       <AdminHeader title="Website CMS" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
           <Link href="/" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
             Preview website ↗

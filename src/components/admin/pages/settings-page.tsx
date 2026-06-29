@@ -74,8 +74,7 @@ export function SettingsPageContent() {
   return (
     <>
       <AdminHeader title="Settings" />
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-28 sm:p-6">
+      <div className="p-4 pb-28 sm:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <Link href="/admin/cms" className="text-sm text-muted-foreground hover:text-foreground">
               ← Back to CMS
@@ -200,9 +199,8 @@ export function SettingsPageContent() {
               </Button>
             </div>
           </div>
-        </div>
-        <CmsStickyFooter isDirty={isDirty} saving={saving} lastSavedAt={lastSavedAt} onSave={save} onCancel={onCancel} />
       </div>
+      <CmsStickyFooter isDirty={isDirty} saving={saving} lastSavedAt={lastSavedAt} onSave={save} onCancel={onCancel} />
     </>
   );
 }

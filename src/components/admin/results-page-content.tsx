@@ -214,7 +214,7 @@ export function ResultsPageContent() {
   return (
     <>
       <AdminHeader title="Results" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {loading ? <AdminLoadingText label="Loading results..." /> : `${items.length} results`}

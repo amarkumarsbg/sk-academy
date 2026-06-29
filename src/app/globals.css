@@ -129,6 +129,18 @@
   }
 }
 
+/* Admin portal: allow native page scroll on mobile (nested overflow traps break iOS touch scroll) */
+@media (max-width: 767px) {
+  html:has([data-admin-portal]),
+  body:has([data-admin-portal]) {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 @keyframes announcement-marquee {
   0% {
     left: 100%;

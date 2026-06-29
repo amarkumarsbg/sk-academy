@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
 import { AdminDataTable } from "@/components/admin/admin-data-table";
@@ -34,7 +35,8 @@ import {
   getInitials,
 } from "@/lib/student-utils";
 import type { StudentRecord } from "@/types/student";
-import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, GraduationCap } from "lucide-react";
+import { getStudentStatusClass } from "@/lib/admin-ui";
 
 const PAGE_SIZE = 10;
 
@@ -54,6 +56,14 @@ function statusVariant(status: string) {
   if (status === "Active") return "default";
   if (status === "Graduated") return "secondary";
   return "outline";
+}
+
+function StudentStatusBadge({ status }: { status: string }) {
+  return (
+    <Badge variant="outline" className={getStudentStatusClass(status)}>
+      {status}
+    </Badge>
+  );
 }
 
 export function StudentsPageContent() {
@@ -170,9 +180,7 @@ export function StudentsPageContent() {
     {
       key: "status",
       label: "Status",
-      render: (row: StudentRecord) => (
-        <Badge variant={statusVariant(row.status)}>{row.status}</Badge>
-      ),
+      render: (row: StudentRecord) => <StudentStatusBadge status={row.status} />,
     },
     {
       key: "actions",
@@ -209,10 +217,19 @@ export function StudentsPageContent() {
     },
   ];
 
+  const hasFilters = Boolean(search) || classFilter !== "All" || statusFilter !== "All";
+
+  function clearFilters() {
+    setSearch("");
+    setClassFilter("All");
+    setStatusFilter("All");
+    setPage(1);
+  }
+
   return (
     <>
       <AdminHeader title="Students" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {loading ? <AdminLoadingText label="Loading students..." /> : `${items.length} students total`}
@@ -223,8 +240,8 @@ export function StudentsPageContent() {
           </Button>
         </div>
 
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative flex-1">
+        <div className="sticky top-0 z-10 -mx-4 mb-4 space-y-3 border-b bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
@@ -236,7 +253,7 @@ export function StudentsPageContent() {
               }}
             />
           </div>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+          <div className="flex flex-wrap items-center gap-2">
             <Select
               value={classFilter}
               onValueChange={(v) => {
@@ -274,6 +291,11 @@ export function StudentsPageContent() {
                 ))}
               </SelectContent>
             </Select>
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            )}
           </div>
         </div>
 
@@ -327,132 +349,149 @@ export function StudentsPageContent() {
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-            <p className="mb-4 text-sm text-muted-foreground">
-              {search || classFilter !== "All" || statusFilter !== "All"
-                ? "No students match your search or filters."
-                : "No students found."}
-            </p>
-            <Button size="sm" onClick={openCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Student
-            </Button>
-          </div>
+          <AdminEmptyState
+            icon={GraduationCap}
+            title={hasFilters ? "No students match your filters" : "No students found"}
+            description={
+              hasFilters
+                ? "Try adjusting your search or filters, or clear them to see all students."
+                : "Click Add Student to create your first student record."
+            }
+            actionLabel={hasFilters ? "Clear filters" : "Add Student"}
+            onAction={hasFilters ? clearFilters : openCreate}
+          />
         )}
       </div>
 
       {/* Add / Edit dialog */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
+        <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+          <DialogHeader className="shrink-0 px-6 pt-6">
             <DialogTitle>{editing ? "Edit Student" : "Add Student"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="student-id">Student ID</Label>
-              <Input id="student-id" value={form.id} readOnly className="bg-muted" />
-              <p className="text-xs text-muted-foreground">Auto-generated</p>
-            </div>
-            <ImageUploadField
-              label="Student photo"
-              value={form.photo ?? ""}
-              onChange={(photo) => setForm({ ...form, photo })}
-              previewClassName="aspect-square max-h-32 max-w-32"
-            />
-            <div className="space-y-2">
-              <Label htmlFor="student-name">Name</Label>
-              <Input
-                id="student-name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Full name"
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Class</Label>
-                <Select value={form.class} onValueChange={(v) => setForm({ ...form, class: v ?? "" })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {STUDENT_CLASSES.map((cls) => (
-                      <SelectItem key={cls} value={cls}>
-                        {cls}
-                      </SelectItem>
-                    ))}
-                    {!STUDENT_CLASSES.includes(form.class as (typeof STUDENT_CLASSES)[number]) && form.class && (
-                      <SelectItem value={form.class}>{form.class}</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="roll-no">Roll No</Label>
-                <Input
-                  id="roll-no"
-                  value={form.rollNo}
-                  onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
-                  placeholder="e.g. 15"
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+            <div className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Photo</h3>
+                <ImageUploadField
+                  label="Student photo"
+                  value={form.photo ?? ""}
+                  onChange={(photo) => setForm({ ...form, photo })}
+                  previewClassName="aspect-square mx-auto max-h-48 w-full max-w-48 rounded-xl border"
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={form.status}
-                onValueChange={(v) => setForm({ ...form, status: v ?? "Active" })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STUDENT_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parent-name">Parent Name</Label>
-              <Input
-                id="parent-name"
-                value={form.parent}
-                onChange={(e) => setForm({ ...form, parent: e.target.value })}
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="parent-phone">Parent Phone</Label>
-                <Input
-                  id="parent-phone"
-                  type="tel"
-                  value={form.parentPhone ?? ""}
-                  onChange={(e) => setForm({ ...form, parentPhone: e.target.value })}
-                  placeholder="+91 98765 43210"
-                />
+
+              <div>
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Student details</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="student-id">Student ID</Label>
+                    <Input id="student-id" value={form.id} readOnly className="bg-muted" />
+                    <p className="text-xs text-muted-foreground">Auto-generated</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="student-name">Name</Label>
+                    <Input
+                      id="student-name"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="Full name"
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Class</Label>
+                      <Select value={form.class} onValueChange={(v) => setForm({ ...form, class: v ?? "" })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STUDENT_CLASSES.map((cls) => (
+                            <SelectItem key={cls} value={cls}>
+                              {cls}
+                            </SelectItem>
+                          ))}
+                          {!STUDENT_CLASSES.includes(form.class as (typeof STUDENT_CLASSES)[number]) &&
+                            form.class && <SelectItem value={form.class}>{form.class}</SelectItem>}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="roll-no">Roll No</Label>
+                      <Input
+                        id="roll-no"
+                        value={form.rollNo}
+                        onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
+                        placeholder="e.g. 15"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select
+                      value={form.status}
+                      onValueChange={(v) => setForm({ ...form, status: v ?? "Active" })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STUDENT_STATUSES.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="parent-email">Parent Email</Label>
-                <Input
-                  id="parent-email"
-                  type="email"
-                  value={form.parentEmail ?? ""}
-                  onChange={(e) => setForm({ ...form, parentEmail: e.target.value })}
-                  placeholder="parent@email.com"
-                />
+
+              <div>
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Parent / Guardian</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="parent-name">Parent Name</Label>
+                    <Input
+                      id="parent-name"
+                      value={form.parent}
+                      onChange={(e) => setForm({ ...form, parent: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="parent-phone">Parent Phone</Label>
+                      <Input
+                        id="parent-phone"
+                        type="tel"
+                        value={form.parentPhone ?? ""}
+                        onChange={(e) => setForm({ ...form, parentPhone: e.target.value })}
+                        placeholder="+91 98765 43210"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="parent-email">Parent Email</Label>
+                      <Input
+                        id="parent-email"
+                        type="email"
+                        value={form.parentEmail ?? ""}
+                        onChange={(e) => setForm({ ...form, parentEmail: e.target.value })}
+                        placeholder="parent@email.com"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {formError && <p className="text-sm text-destructive">{formError}</p>}
             </div>
-            {formError && <p className="text-sm text-destructive">{formError}</p>}
           </div>
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
             <Button variant="outline" onClick={() => setFormOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={submitting}>
-              {submitting ? "Saving..." : "Save"}
+              {submitting ? "Saving..." : "Save Student"}
             </Button>
           </DialogFooter>
         </DialogContent>

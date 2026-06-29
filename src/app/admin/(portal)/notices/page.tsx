@@ -14,7 +14,7 @@ export default function NoticesPage() {
   return (
     <>
       <AdminHeader title="Notices" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         <div className="mb-4 flex flex-wrap justify-end gap-2">
           <ButtonLink href="/admin/cms/news" size="sm">
             <Pencil className="mr-2 h-4 w-4" />

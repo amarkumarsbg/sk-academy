@@ -40,40 +40,44 @@ export type AdminNavItem = {
   label: string;
   href: string;
   icon: string;
+  group?: string;
   hidden?: boolean;
 };
 
 export const adminNav: AdminNavItem[] = [
-  { label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
-  { label: "Students", href: "/admin/students", icon: "GraduationCap" },
-  { label: "Teachers", href: "/admin/teachers", icon: "Users" },
-  { label: "Admissions", href: "/admin/admissions", icon: "ClipboardList" },
+  { label: "Dashboard", href: "/admin", icon: "LayoutDashboard", group: "Management" },
+  { label: "Students", href: "/admin/students", icon: "GraduationCap", group: "Management" },
+  { label: "Teachers", href: "/admin/teachers", icon: "Users", group: "Management" },
+  { label: "Admissions", href: "/admin/admissions", icon: "ClipboardList", group: "Management" },
+  { label: "Inbox", href: "/admin/inbox", icon: "Inbox", group: "Management" },
   {
     label: "Attendance",
     href: "/admin/attendance",
     icon: "CalendarCheck",
+    group: "Academic",
     hidden: !adminFeatures.attendance,
   },
   {
     label: "Fees",
     href: "/admin/fees",
     icon: "IndianRupee",
+    group: "Academic",
     hidden: !adminFeatures.fees,
   },
-  { label: "Exams", href: "/admin/exams", icon: "FileText" },
+  { label: "Exams", href: "/admin/exams", icon: "FileText", group: "Academic" },
   {
     label: "Results",
     href: "/admin/results",
     icon: "Award",
+    group: "Academic",
     hidden: !adminFeatures.results,
   },
-  { label: "Notices", href: "/admin/notices", icon: "Bell" },
-  { label: "Inbox", href: "/admin/inbox", icon: "Inbox" },
-  { label: "Events", href: "/admin/events", icon: "Calendar" },
-  { label: "Website CMS", href: "/admin/cms", icon: "Globe" },
-  { label: "Staff Users", href: "/admin/users", icon: "UserCog" },
-  { label: "Audit Log", href: "/admin/audit-log", icon: "ScrollText" },
-  { label: "Settings", href: "/admin/settings", icon: "Settings" },
+  { label: "Notices", href: "/admin/notices", icon: "Bell", group: "Content" },
+  { label: "Events", href: "/admin/events", icon: "Calendar", group: "Content" },
+  { label: "Website CMS", href: "/admin/cms", icon: "Globe", group: "Content" },
+  { label: "Staff Users", href: "/admin/users", icon: "UserCog", group: "System" },
+  { label: "Audit Log", href: "/admin/audit-log", icon: "ScrollText", group: "System" },
+  { label: "Settings", href: "/admin/settings", icon: "Settings", group: "System" },
 ];
 
 export const visibleAdminNav = adminNav.filter((item) => !item.hidden);

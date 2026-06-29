@@ -13,10 +13,10 @@ interface Column<T> {
   key: keyof T | string;
   label: string;
   render?: (row: T) => React.ReactNode;
-  /** Hide this field in the mobile card layout (e.g. duplicate action columns). */
   hideOnMobile?: boolean;
-  /** Show prominently at the top of the mobile card (first matching column wins). */
   primary?: boolean;
+  /** Combine with another column on one line in mobile cards */
+  mobileInlineWith?: string;
 }
 
 interface AdminDataTableProps<T extends object> {
@@ -40,39 +40,75 @@ export function AdminDataTable<T extends object>({
 }: AdminDataTableProps<T>) {
   const mobileColumns = columns.filter((col) => !col.hideOnMobile);
   const primaryColumn = mobileColumns.find((col) => col.primary) ?? mobileColumns[0];
+  const actionsColumn = mobileColumns.find((col) => col.key === "actions");
+  const detailColumns = mobileColumns.filter(
+    (col) => col !== primaryColumn && col !== actionsColumn && !col.mobileInlineWith
+  );
+  const inlinePairs = mobileColumns.filter((col) => col.mobileInlineWith);
 
   return (
-    <Card className="overflow-hidden py-0">
+    <Card className="overflow-hidden py-0 shadow-sm">
       <div className="space-y-3 p-3 md:hidden">
         {data.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">No records found.</p>
         ) : (
           data.map((row, i) => {
             const primaryValue = primaryColumn ? getCellValue(row, primaryColumn) : null;
+            const statusCol = mobileColumns.find((c) => c.key === "status");
+            const statusValue = statusCol ? getCellValue(row, statusCol) : null;
+
+            const classCol = mobileColumns.find((c) => c.key === "class");
+            const rollCol = mobileColumns.find((c) => c.key === "rollNo");
+            const classValue = classCol ? getCellValue(row, classCol) : null;
+            const rollValue = rollCol ? getCellValue(row, rollCol) : null;
 
             return (
-              <div key={i} className="rounded-lg border bg-background p-3 shadow-sm">
-                {primaryColumn && !isEmptyValue(primaryValue) && (
-                  <div className="mb-2 border-b pb-2">
-                    <p className="text-xs font-medium text-muted-foreground">{primaryColumn.label}</p>
-                    <div className="text-sm font-semibold">{primaryValue}</div>
+              <div key={i} className="rounded-xl border bg-background p-3 shadow-sm">
+                <div className="mb-2 flex items-start justify-between gap-2 border-b pb-2">
+                  <div className="min-w-0">
+                    {primaryColumn && !isEmptyValue(primaryValue) && (
+                      <div className="text-sm font-semibold">{primaryValue}</div>
+                    )}
+                    {(classValue || rollValue) && (
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {[classValue && `Class ${classValue}`, rollValue && `Roll ${rollValue}`]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
                   </div>
-                )}
-                <dl className="space-y-2">
-                  {mobileColumns
-                    .filter((col) => col !== primaryColumn)
+                  {statusValue && <div className="shrink-0">{statusValue}</div>}
+                </div>
+
+                <dl className="space-y-1.5">
+                  {detailColumns
+                    .filter((col) => col.key !== "status" && col.key !== "class" && col.key !== "rollNo")
                     .map((col) => {
                       const value = getCellValue(row, col);
                       if (isEmptyValue(value)) return null;
 
                       return (
-                        <div key={String(col.key)} className="flex flex-col gap-0.5">
-                          <dt className="text-xs font-medium text-muted-foreground">{col.label}</dt>
-                          <dd className="text-sm break-words">{value}</dd>
+                        <div key={String(col.key)} className="flex items-baseline justify-between gap-3">
+                          <dt className="shrink-0 text-xs text-muted-foreground">{col.label}</dt>
+                          <dd className="text-right text-sm">{value}</dd>
                         </div>
                       );
                     })}
+                  {inlinePairs.map((col) => {
+                    const partner = mobileColumns.find((c) => String(c.key) === col.mobileInlineWith);
+                    if (!partner) return null;
+                    const v1 = getCellValue(row, col);
+                    const v2 = getCellValue(row, partner);
+                    if (isEmptyValue(v1) && isEmptyValue(v2)) return null;
+                    return null;
+                  })}
                 </dl>
+
+                {actionsColumn && (
+                  <div className="mt-3 flex justify-end gap-2 border-t pt-2">
+                    {getCellValue(row, actionsColumn)}
+                  </div>
+                )}
               </div>
             );
           })

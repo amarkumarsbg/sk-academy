@@ -42,7 +42,7 @@ function StatusSelect({
 
   return (
     <Select value={status} onValueChange={(v) => onChange(normalizeStatus(v as InboxStatus | undefined))}>
-      <SelectTrigger className="h-10 w-full min-w-[7.5rem] shrink-0 text-sm sm:w-[7.5rem]">
+      <SelectTrigger className="h-9 w-[7.5rem] shrink-0 text-sm">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -82,32 +82,31 @@ function InboxItemCard({
   body?: React.ReactNode;
 }) {
   const normalizedStatus = normalizeStatus(status);
+  const dateLabel = formatDateTimeLong(new Date(createdAt));
 
   return (
     <Card className={cn("overflow-hidden border-l-4 shadow-sm", statusStyles[normalizedStatus])}>
       <CardContent className="space-y-3 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate font-semibold leading-tight">{name}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {formatDateTimeLong(new Date(createdAt))}
-            </p>
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <p className="min-w-0 flex-1 font-semibold leading-tight">{name}</p>
+            <StatusSelect value={status} onChange={onStatusChange} />
           </div>
-          <StatusSelect value={status} onChange={onStatusChange} />
+          <p className="text-xs leading-snug text-muted-foreground">{dateLabel}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
           {meta}
         </div>
 
         {body}
 
-        <div className="flex items-center gap-2 border-t pt-3">
+        <div className="flex flex-col gap-2 border-t pt-3 sm:flex-row sm:items-center">
           <span className="shrink-0 text-xs font-medium text-muted-foreground">Note</span>
           <Input
             defaultValue={notes ?? ""}
             placeholder="Add an internal note…"
-            className="h-8"
+            className="h-9"
             onBlur={(e) => onNotesChange(e.target.value)}
           />
         </div>
@@ -156,7 +155,7 @@ export function InboxPageContent() {
   return (
     <>
       <AdminHeader title="Inbox" subtitle="Contact messages and admission inquiries" />
-      <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="p-4 pb-8 sm:p-6">
         {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
         {loading ? (

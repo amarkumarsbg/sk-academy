@@ -2,14 +2,17 @@
 
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ChevronDown, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, ChevronDown, Crop, Trash2, Upload } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminButtonSpinner, LoadingSpinner } from "@/components/admin/admin-loading";
 import { markCmsSectionSaved, useCmsToast } from "@/components/admin/cms-toast";
+import { ImageEditorDialog } from "@/components/admin/image-editor-dialog";
 import { ContentImage } from "@/components/public/content-image";
 import { useSiteContent } from "@/context/site-content-provider";
 import { formatRelativeTime } from "@/lib/format-relative-time";
-import { readImageAsDataUrl } from "@/lib/read-image-file";
+import { uploadImage } from "@/lib/api/client";
+import { resolveEditableImageSrc } from "@/lib/image-editor";
+import { createImageObjectUrl } from "@/lib/read-image-file";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -327,25 +330,79 @@ export function ImageUploadField({
   value,
   onChange,
   previewClassName = "aspect-video max-h-44",
+  cropAspect = 16 / 9,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   previewClassName?: string;
+  cropAspect?: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorSrc, setEditorSrc] = useState<string | null>(null);
+  const [editorObjectUrl, setEditorObjectUrl] = useState<string | null>(null);
 
-  const handleFile = async (file: File) => {
+  const closeEditor = () => {
+    setEditorOpen(false);
+    setEditorSrc(null);
+    if (editorObjectUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(editorObjectUrl);
+    }
+    setEditorObjectUrl(null);
+  };
+
+  const openEditorWithFile = (file: File) => {
+    setError(null);
+    try {
+      const objectUrl = createImageObjectUrl(file, { maxSizeMB: 5 });
+      if (editorObjectUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(editorObjectUrl);
+      }
+      setEditorObjectUrl(objectUrl);
+      setEditorSrc(objectUrl);
+      setEditorOpen(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not open image editor.");
+    }
+  };
+
+  const openEditorWithValue = async () => {
+    if (!value || loading) return;
+
     setError(null);
     setLoading(true);
+
     try {
-      const url = await readImageAsDataUrl(file, { maxSizeMB: 5 });
+      const src = await resolveEditableImageSrc(value);
+      if (editorObjectUrl?.startsWith("blob:") && editorObjectUrl !== src) {
+        URL.revokeObjectURL(editorObjectUrl);
+      }
+      if (src.startsWith("blob:")) {
+        setEditorObjectUrl(src);
+      }
+      setEditorSrc(src);
+      setEditorOpen(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not open image editor.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadEditedFile = async (file: File) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = await uploadImage(file);
       onChange(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
+      const message = err instanceof Error ? err.message : "Upload failed.";
+      setError(message);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -378,7 +435,7 @@ export function ImageUploadField({
           e.preventDefault();
           setDragOver(false);
           const file = e.dataTransfer.files?.[0];
-          if (file) void handleFile(file);
+          if (file) openEditorWithFile(file);
         }}
       >
         {value ? (
@@ -391,7 +448,7 @@ export function ImageUploadField({
                   Uploading…
                 </span>
               ) : (
-                "Click or drop to replace"
+                "Choose new image"
               )}
             </span>
           </>
@@ -414,9 +471,15 @@ export function ImageUploadField({
       </button>
 
       {value && (
-        <Button type="button" variant="ghost" size="sm" disabled={loading} onClick={() => onChange("")}>
-          Remove
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" disabled={loading} onClick={() => void openEditorWithValue()}>
+            <Crop className="h-3.5 w-3.5" />
+            Crop & adjust
+          </Button>
+          <Button type="button" variant="ghost" size="sm" disabled={loading} onClick={() => onChange("")}>
+            Remove
+          </Button>
+        </div>
       )}
 
       <input
@@ -426,13 +489,28 @@ export function ImageUploadField({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) void handleFile(file);
+          if (file) openEditorWithFile(file);
           e.target.value = "";
         }}
       />
 
-      <p className="text-xs text-muted-foreground">JPG, PNG, WebP, or GIF · max 5 MB</p>
+      <p className="text-xs text-muted-foreground">
+        JPG, PNG, WebP, or GIF · max 5 MB · crop and preview before upload
+      </p>
       {error && <p className="text-xs text-destructive">{error}</p>}
+
+      <ImageEditorDialog
+        open={editorOpen}
+        onOpenChange={(open) => {
+          if (!open) closeEditor();
+          else setEditorOpen(true);
+        }}
+        imageSrc={editorSrc}
+        aspect={cropAspect}
+        previewClassName={previewClassName.replace(/max-h-\S+/g, "").trim() || "aspect-video"}
+        onApply={uploadEditedFile}
+        onClose={closeEditor}
+      />
     </div>
   );
 }

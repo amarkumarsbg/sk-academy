@@ -4,12 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import { createResource, deleteResource, fetchResource, updateResource } from "@/lib/api";
 
-export function useResource<T extends { id: string }>(resource: string) {
+export function useResource<T extends { id: string }>(
+  resource: string,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled ?? true;
   const [items, setItems] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
+    if (!enabled) return;
     setLoading(true);
     setError("");
     try {
@@ -20,13 +25,18 @@ export function useResource<T extends { id: string }>(resource: string) {
     } finally {
       setLoading(false);
     }
-  }, [resource]);
+  }, [enabled, resource]);
 
   useEffect(() => {
-    // Data fetching on mount
+    if (!enabled) {
+      setItems([]);
+      setLoading(false);
+      setError("");
+      return;
+    }
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load when resource changes
-  }, [resource]);
+  }, [enabled, resource]);
 
   const create = async (data: T) => {
     const created = await createResource<T>(resource, data);

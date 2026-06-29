@@ -24,7 +24,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import { adminNav, siteConfig } from "@/lib/config";
+import { visibleAdminNav, siteConfig } from "@/lib/config";
 import { logout } from "@/lib/api";
 import { getInitials, useCurrentUser } from "@/hooks/use-current-user";
 import { useAdminLoginPath, useAdminNavItem, usePublicSiteUrl } from "@/hooks/use-admin-host";
@@ -70,7 +70,7 @@ function AdminNavLink({
   item,
   onNavigate,
 }: {
-  item: (typeof adminNav)[number];
+  item: (typeof visibleAdminNav)[number];
   onNavigate?: () => void;
 }) {
   const { href, isActive } = useAdminNavItem(item.href);
@@ -109,7 +109,7 @@ export function AdminSidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {adminNav.map((item) => (
+        {visibleAdminNav.map((item) => (
           <AdminNavLink key={item.href} item={item} />
         ))}
       </nav>
@@ -164,7 +164,7 @@ export function AdminMobileNav() {
             </SheetTitle>
           </SheetHeader>
           <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-            {adminNav.map((item) => (
+            {visibleAdminNav.map((item) => (
               <AdminNavLink key={item.href} item={item} onNavigate={() => setOpen(false)} />
             ))}
           </nav>
@@ -183,7 +183,7 @@ export function AdminMobileNav() {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-        {adminNav.slice(0, 4).map((item) => (
+        {visibleAdminNav.slice(0, 4).map((item) => (
           <AdminNavLink key={item.href} item={item} />
         ))}
       </div>

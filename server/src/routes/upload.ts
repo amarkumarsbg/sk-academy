@@ -20,7 +20,7 @@ const imageUpload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!file.mimetype.startsWith("image/")) {
-      cb(new AppError("Only image files are allowed", 400));
+      cb(new Error("Only image files are allowed"));
       return;
     }
     cb(null, true);
@@ -33,7 +33,7 @@ const documentUpload = multer({
   fileFilter: (_req, file, cb) => {
     const allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.mimetype)) {
-      cb(new AppError("Only PDF or image files are allowed", 400));
+      cb(new Error("Only PDF or image files are allowed"));
       return;
     }
     cb(null, true);
@@ -42,7 +42,19 @@ const documentUpload = multer({
 
 async function persistFile(file: Express.Multer.File, folder: string, resourceType: "image" | "raw" = "image") {
   if (env.cloudinaryEnabled) {
-    return uploadToCloudinary(file.buffer, { folder, resourceType });
+    try {
+      return await uploadToCloudinary(file.buffer, { folder, resourceType });
+    } catch (err) {
+      console.error("Cloudinary upload failed:", err);
+      if (env.isProduction) {
+        const detail = err instanceof Error ? err.message : "unknown error";
+        throw new AppError(
+          `Cloudinary upload failed (${detail}). Verify CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on the server.`,
+          502
+        );
+      }
+      console.warn("Using local uploads folder instead (development fallback).");
+    }
   }
 
   const ext = path.extname(file.originalname) || (resourceType === "raw" ? ".pdf" : ".jpg");
@@ -60,8 +72,16 @@ uploadRouter.post(
   imageUpload.single("file"),
   asyncHandler(async (req, res) => {
     if (!req.file) throw new AppError("No file uploaded", 400);
-    const url = await persistFile(req.file, "images", "image");
-    res.status(201).json({ url });
+    try {
+      const url = await persistFile(req.file, "images", "image");
+      res.status(201).json({ url });
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      throw new AppError(
+        err instanceof Error ? err.message : "Image upload failed. Check server storage settings.",
+        500
+      );
+    }
   })
 );
 

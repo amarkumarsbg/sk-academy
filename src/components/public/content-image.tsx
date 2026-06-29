@@ -10,13 +10,14 @@ export function ContentImage({ src, alt, ...props }: ContentImageProps) {
   if (!src) return null;
 
   const isDataUrl = src.startsWith("data:");
+  const isBlobUrl = src.startsWith("blob:");
   const isLocalAsset = src.startsWith("/");
 
   return (
     <Image
       src={src}
       alt={alt}
-      unoptimized={isDataUrl || isLocalAsset}
+      unoptimized={isDataUrl || isBlobUrl || isLocalAsset}
       {...props}
     />
   );

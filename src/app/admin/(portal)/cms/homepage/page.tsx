@@ -104,7 +104,7 @@ export default function CmsHomepagePage() {
       </CmsAccordionSection>
 
       <CmsAccordionSection title="Principal's Message">
-        <ImageUploadField label="Principal Photo" value={homepage.principalImage} onChange={(v) => setHomepage({ ...homepage, principalImage: v })} />
+        <ImageUploadField label="Principal Photo" value={homepage.principalImage} onChange={(v) => setHomepage({ ...homepage, principalImage: v })} previewClassName="aspect-square max-h-40" cropAspect={1} />
         <Field label="Name" value={homepage.principalName} onChange={(v) => setHomepage({ ...homepage, principalName: v })} />
         <Field label="Title" value={homepage.principalTitle} onChange={(v) => setHomepage({ ...homepage, principalTitle: v })} />
         <TextAreaField label="Message" value={homepage.principalMessage} onChange={(v) => setHomepage({ ...homepage, principalMessage: v })} maxLength={600} />

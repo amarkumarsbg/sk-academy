@@ -29,15 +29,44 @@ export const publicNav = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const adminNav = [
+/** Toggle admin modules without removing routes or backend APIs. */
+export const adminFeatures = {
+  attendance: false,
+  fees: false,
+  results: false,
+} as const;
+
+export type AdminNavItem = {
+  label: string;
+  href: string;
+  icon: string;
+  hidden?: boolean;
+};
+
+export const adminNav: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
   { label: "Students", href: "/admin/students", icon: "GraduationCap" },
   { label: "Teachers", href: "/admin/teachers", icon: "Users" },
   { label: "Admissions", href: "/admin/admissions", icon: "ClipboardList" },
-  { label: "Attendance", href: "/admin/attendance", icon: "CalendarCheck" },
-  { label: "Fees", href: "/admin/fees", icon: "IndianRupee" },
+  {
+    label: "Attendance",
+    href: "/admin/attendance",
+    icon: "CalendarCheck",
+    hidden: !adminFeatures.attendance,
+  },
+  {
+    label: "Fees",
+    href: "/admin/fees",
+    icon: "IndianRupee",
+    hidden: !adminFeatures.fees,
+  },
   { label: "Exams", href: "/admin/exams", icon: "FileText" },
-  { label: "Results", href: "/admin/results", icon: "Award" },
+  {
+    label: "Results",
+    href: "/admin/results",
+    icon: "Award",
+    hidden: !adminFeatures.results,
+  },
   { label: "Notices", href: "/admin/notices", icon: "Bell" },
   { label: "Inbox", href: "/admin/inbox", icon: "Inbox" },
   { label: "Events", href: "/admin/events", icon: "Calendar" },
@@ -46,3 +75,5 @@ export const adminNav = [
   { label: "Audit Log", href: "/admin/audit-log", icon: "ScrollText" },
   { label: "Settings", href: "/admin/settings", icon: "Settings" },
 ];
+
+export const visibleAdminNav = adminNav.filter((item) => !item.hidden);

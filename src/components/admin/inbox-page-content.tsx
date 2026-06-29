@@ -3,14 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Mail, Phone } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
-import { AdminLoadingText, AdminPageLoading } from "@/components/admin/admin-loading";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { AdminPageLoading } from "@/components/admin/admin-loading";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import {
   fetchAdmissionInquiries,
   fetchContactMessages,
@@ -22,11 +19,12 @@ import {
 } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
 import { formatDateTimeLong } from "@/lib/format-relative-time";
+import { cn } from "@/lib/utils";
 
-const statusColors: Record<InboxStatus, string> = {
-  new: "bg-amber-500 text-white",
-  read: "bg-blue-600 text-white",
-  resolved: "bg-emerald-600 text-white",
+const statusStyles: Record<InboxStatus, string> = {
+  new: "border-l-amber-500",
+  read: "border-l-blue-500",
+  resolved: "border-l-emerald-500",
 };
 
 function normalizeStatus(status: InboxStatus | undefined): InboxStatus {
@@ -44,7 +42,7 @@ function StatusSelect({
 
   return (
     <Select value={status} onValueChange={(v) => onChange(normalizeStatus(v as InboxStatus | undefined))}>
-      <SelectTrigger className="w-[140px]">
+      <SelectTrigger className="h-8 w-[7.5rem] shrink-0 text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -53,6 +51,68 @@ function StatusSelect({
         <SelectItem value="resolved">Resolved</SelectItem>
       </SelectContent>
     </Select>
+  );
+}
+
+function ContactLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a href={href} className="truncate hover:text-primary hover:underline">
+      {children}
+    </a>
+  );
+}
+
+function InboxItemCard({
+  name,
+  createdAt,
+  status,
+  onStatusChange,
+  notes,
+  onNotesChange,
+  meta,
+  body,
+}: {
+  name: string;
+  createdAt: string;
+  status: InboxStatus | undefined;
+  onStatusChange: (status: InboxStatus) => void;
+  notes?: string;
+  onNotesChange: (notes: string) => void;
+  meta: React.ReactNode;
+  body?: React.ReactNode;
+}) {
+  const normalizedStatus = normalizeStatus(status);
+
+  return (
+    <Card className={cn("overflow-hidden border-l-4 shadow-sm", statusStyles[normalizedStatus])}>
+      <CardContent className="space-y-3 p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate font-semibold leading-tight">{name}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {formatDateTimeLong(new Date(createdAt))}
+            </p>
+          </div>
+          <StatusSelect value={status} onChange={onStatusChange} />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          {meta}
+        </div>
+
+        {body}
+
+        <div className="flex items-center gap-2 border-t pt-3">
+          <span className="shrink-0 text-xs font-medium text-muted-foreground">Note</span>
+          <Input
+            defaultValue={notes ?? ""}
+            placeholder="Add an internal note…"
+            className="h-8"
+            onBlur={(e) => onNotesChange(e.target.value)}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -90,6 +150,9 @@ export function InboxPageContent() {
     setInquiries((rows) => rows.map((row) => (row._id === id ? updated : row)));
   };
 
+  const contactNewCount = contactMessages.filter((m) => normalizeStatus(m.status) === "new").length;
+  const inquiryNewCount = inquiries.filter((m) => normalizeStatus(m.status) === "new").length;
+
   return (
     <>
       <AdminHeader title="Inbox" subtitle="Contact messages and admission inquiries" />
@@ -101,112 +164,80 @@ export function InboxPageContent() {
         ) : (
           <Tabs defaultValue="contact">
             <TabsList>
-              <TabsTrigger value="contact">
-                Contact ({contactMessages.filter((m) => normalizeStatus(m.status) === "new").length} new)
-              </TabsTrigger>
-              <TabsTrigger value="inquiries">
-                Admissions ({inquiries.filter((m) => normalizeStatus(m.status) === "new").length} new)
-              </TabsTrigger>
+              <TabsTrigger value="contact">Contact ({contactNewCount} new)</TabsTrigger>
+              <TabsTrigger value="inquiries">Admissions ({inquiryNewCount} new)</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="contact" className="mt-4 space-y-4">
+            <TabsContent value="contact" className="mt-4 space-y-3">
               {contactMessages.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No contact messages yet.</p>
               ) : (
                 contactMessages.map((message) => (
-                  <Card key={message._id}>
-                    <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
-                      <div>
-                        <CardTitle className="text-base">{message.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">{formatDateTimeLong(new Date(message.createdAt))}</p>
-                      </div>
-                      <Badge className={statusColors[normalizeStatus(message.status)]}>{normalizeStatus(message.status)}</Badge>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                        <span className="inline-flex items-center gap-1">
-                          <Mail className="h-4 w-4" />
-                          <a href={`mailto:${message.email}`} className="hover:text-primary">
-                            {message.email}
-                          </a>
+                  <InboxItemCard
+                    key={message._id}
+                    name={message.name}
+                    createdAt={message.createdAt}
+                    status={message.status}
+                    notes={message.notes}
+                    onStatusChange={(status) => void updateContact(message._id, { status })}
+                    onNotesChange={(notes) =>
+                      void updateContact(message._id, { status: normalizeStatus(message.status), notes })
+                    }
+                    meta={
+                      <>
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <Mail className="h-3.5 w-3.5 shrink-0" />
+                          <ContactLink href={`mailto:${message.email}`}>{message.email}</ContactLink>
                         </span>
                         {message.phone && (
-                          <span className="inline-flex items-center gap-1">
-                            <Phone className="h-4 w-4" />
-                            <a href={`tel:${message.phone}`} className="hover:text-primary">
-                              {message.phone}
-                            </a>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Phone className="h-3.5 w-3.5 shrink-0" />
+                            <ContactLink href={`tel:${message.phone}`}>{message.phone}</ContactLink>
                           </span>
                         )}
-                      </div>
-                      <p className="text-sm leading-relaxed">{message.message}</p>
-                      <div className="flex flex-wrap items-end gap-3">
-                        <div className="space-y-1">
-                          <Label>Status</Label>
-                          <StatusSelect
-                            value={message.status}
-                            onChange={(status) => void updateContact(message._id, { status })}
-                          />
-                        </div>
-                        <div className="min-w-[220px] flex-1 space-y-1">
-                          <Label>Notes</Label>
-                          <Textarea
-                            rows={2}
-                            defaultValue={message.notes ?? ""}
-                            onBlur={(e) => void updateContact(message._id, { status: normalizeStatus(message.status), notes: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </>
+                    }
+                    body={
+                      <p className="rounded-md bg-muted/50 px-3 py-2 text-sm leading-relaxed text-foreground">
+                        {message.message}
+                      </p>
+                    }
+                  />
                 ))
               )}
             </TabsContent>
 
-            <TabsContent value="inquiries" className="mt-4 space-y-4">
+            <TabsContent value="inquiries" className="mt-4 space-y-3">
               {inquiries.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No admission inquiries yet.</p>
               ) : (
                 inquiries.map((inquiry) => (
-                  <Card key={inquiry._id}>
-                    <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
-                      <div>
-                        <CardTitle className="text-base">{inquiry.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">{formatDateTimeLong(new Date(inquiry.createdAt))}</p>
-                      </div>
-                      <Badge className={statusColors[normalizeStatus(inquiry.status)]}>{normalizeStatus(inquiry.status)}</Badge>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                        <span className="inline-flex items-center gap-1">
-                          <Phone className="h-4 w-4" />
-                          {inquiry.phone}
+                  <InboxItemCard
+                    key={inquiry._id}
+                    name={inquiry.name}
+                    createdAt={inquiry.createdAt}
+                    status={inquiry.status}
+                    notes={inquiry.notes}
+                    onStatusChange={(status) => void updateInquiry(inquiry._id, { status })}
+                    onNotesChange={(notes) =>
+                      void updateInquiry(inquiry._id, { status: normalizeStatus(inquiry.status), notes })
+                    }
+                    meta={
+                      <>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Phone className="h-3.5 w-3.5 shrink-0" />
+                          <ContactLink href={`tel:${inquiry.phone}`}>{inquiry.phone}</ContactLink>
                         </span>
-                        <span className="inline-flex items-center gap-1">
-                          <Mail className="h-4 w-4" />
-                          {inquiry.email}
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <Mail className="h-3.5 w-3.5 shrink-0" />
+                          <ContactLink href={`mailto:${inquiry.email}`}>{inquiry.email}</ContactLink>
                         </span>
-                        <span>Grade: {inquiry.grade}</span>
-                      </div>
-                      <div className="flex flex-wrap items-end gap-3">
-                        <div className="space-y-1">
-                          <Label>Status</Label>
-                          <StatusSelect
-                            value={inquiry.status}
-                            onChange={(status) => void updateInquiry(inquiry._id, { status })}
-                          />
-                        </div>
-                        <div className="min-w-[220px] flex-1 space-y-1">
-                          <Label>Notes</Label>
-                          <Textarea
-                            rows={2}
-                            defaultValue={inquiry.notes ?? ""}
-                            onBlur={(e) => void updateInquiry(inquiry._id, { status: normalizeStatus(inquiry.status), notes: e.target.value })}
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                          Grade {inquiry.grade}
+                        </span>
+                      </>
+                    }
+                  />
                 ))
               )}
             </TabsContent>

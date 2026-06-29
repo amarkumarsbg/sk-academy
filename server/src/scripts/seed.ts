@@ -23,7 +23,15 @@ async function seed() {
   await connectDb();
 
   const existingAdmin = await User.findOne({ email: env.adminEmail.toLowerCase() });
-  if (!existingAdmin) {
+  if (existingAdmin) {
+    if (process.env.SYNC_ADMIN_PASSWORD === "true") {
+      existingAdmin.passwordHash = await bcrypt.hash(env.adminPassword, 12);
+      await existingAdmin.save();
+      console.log(`Admin password synced from ADMIN_PASSWORD for ${env.adminEmail}`);
+    } else {
+      console.log("Admin user already exists");
+    }
+  } else {
     const passwordHash = await bcrypt.hash(env.adminPassword, 12);
     await User.create({
       email: env.adminEmail.toLowerCase(),
@@ -32,8 +40,6 @@ async function seed() {
       role: "admin",
     });
     console.log(`Created admin user: ${env.adminEmail}`);
-  } else {
-    console.log("Admin user already exists");
   }
 
   const existingContent = await SiteContent.findOne({ key: "default" });

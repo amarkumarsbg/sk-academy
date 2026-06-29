@@ -11,6 +11,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "tsx src/scripts/seed.ts",
+    "reset-admin-password": "tsx src/scripts/reset-admin-password.ts",
     "test:email": "node scripts/test-email.mjs"
   },
   "dependencies": {

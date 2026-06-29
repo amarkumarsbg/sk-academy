@@ -3,6 +3,7 @@ import { ContentImage } from "@/components/public/content-image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateLong } from "@/lib/format-date";
+import { stripHtml } from "@/lib/strip-html";
 import type { NewsItem } from "@/types/site-content";
 import { cn } from "@/lib/utils";
 
@@ -41,8 +42,11 @@ export function NewsCard({ item, className }: NewsCardProps) {
         </div>
         <CardTitle className="text-lg leading-snug sm:text-xl">{item.title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm leading-relaxed text-muted-foreground">{item.excerpt}</p>
+      <CardContent className="flex flex-1 flex-col">
+        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+          {stripHtml(item.excerpt)}
+        </p>
+        <span className="mt-4 text-sm font-semibold text-primary">Read full article →</span>
       </CardContent>
     </Card>
     </Link>

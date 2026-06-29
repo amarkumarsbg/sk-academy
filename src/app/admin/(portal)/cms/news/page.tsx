@@ -5,12 +5,13 @@ import { Eye } from "lucide-react";
 import { AddItemButton, CmsPageShell, EmptyState, Field, ImageUploadField, ListItemCard, SectionCard } from "@/components/admin/cms-form-fields";
 import { RichTextField, RichTextPreview } from "@/components/admin/rich-text-field";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createId, useSiteContent } from "@/context/site-content-provider";
 import { useCmsPageDraft } from "@/hooks/use-cms-draft";
+import { cn } from "@/lib/utils";
 import type { NewsItem, NoticeItem, PageHeroContent } from "@/types/site-content";
 
 export default function CmsNewsPage() {
@@ -76,6 +77,7 @@ export default function CmsNewsPage() {
                   id: createId(),
                   title: "New Article",
                   excerpt: "",
+                  body: "",
                   date: new Date().toISOString().slice(0, 10),
                   category: "General",
                   image: "/logo.png",
@@ -93,7 +95,8 @@ export default function CmsNewsPage() {
               onRemove={() => setNews(news.filter((n) => n.id !== item.id))}
             >
               <Field label="Title" value={item.title} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, title: v } : n)))} />
-              <RichTextField label="Excerpt" value={item.excerpt} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, excerpt: v } : n)))} />
+              <RichTextField label="Summary (card preview)" value={item.excerpt} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, excerpt: v } : n)))} rows={3} />
+              <RichTextField label="Full article" value={item.body ?? ""} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, body: v } : n)))} rows={8} />
               <Field label="Category" value={item.category} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, category: v } : n)))} />
               <Field label="Date" value={item.date} type="date" onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, date: v } : n)))} />
               <ImageUploadField label="Image" value={item.image} onChange={(v) => setNews(news.map((n) => (n.id === item.id ? { ...n, image: v } : n)))} />
@@ -121,6 +124,16 @@ export default function CmsNewsPage() {
                     <Eye className="mr-1 h-4 w-4" />
                     Preview
                   </Button>
+                  {item.status === "Published" && (
+                    <a
+                      href={`/news/${item.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                    >
+                      View live
+                    </a>
+                  )}
                 </div>
               </div>
             </ListItemCard>
@@ -136,6 +149,7 @@ export default function CmsNewsPage() {
                   id: createId(),
                   title: "New Article",
                   excerpt: "",
+                  body: "",
                   date: new Date().toISOString().slice(0, 10),
                   category: "General",
                   image: "/logo.png",
@@ -189,7 +203,7 @@ export default function CmsNewsPage() {
               <Badge variant={previewItem.status === "Published" ? "default" : "secondary"}>
                 {previewItem.status}
               </Badge>
-              <RichTextPreview html={previewItem.excerpt} title={previewItem.title} />
+              <RichTextPreview html={previewItem.body || previewItem.excerpt} title={previewItem.title} />
               <p className="text-xs text-muted-foreground">
                 {previewItem.category} · {previewItem.date}
               </p>

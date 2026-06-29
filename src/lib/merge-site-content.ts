@@ -73,7 +73,13 @@ export function mergeStoredSiteContent(stored: Partial<SiteContent>): SiteConten
     heroSlides: stored.heroSlides ?? defaultSiteContent.heroSlides,
     highlights: stored.highlights ?? defaultSiteContent.highlights,
     stats: stored.stats ?? defaultSiteContent.stats,
-    news: stored.news ?? defaultSiteContent.news,
+    news: (stored.news ?? defaultSiteContent.news).map((item) => {
+      const fallback = defaultSiteContent.news.find((entry) => entry.id === item.id);
+      return {
+        ...item,
+        body: item.body?.trim() ? item.body : fallback?.body,
+      };
+    }),
     events: stored.events ?? defaultSiteContent.events,
     notices: stored.notices ?? defaultSiteContent.notices,
     gallery: stored.gallery ?? defaultSiteContent.gallery,

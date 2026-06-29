@@ -1,3 +1,5 @@
+import { newsArticles } from "@/data/news-articles";
+
 export const stats = [
   { label: "Students Enrolled", value: "2,450+", icon: "students" as const },
   { label: "Expert Teachers", value: "120+", icon: "teachers" as const },
@@ -5,62 +7,7 @@ export const stats = [
   { label: "Success Rate", value: "98%", icon: "success" as const },
 ];
 
-export const newsItems = [
-  {
-    id: "1",
-    title: "Annual Function 2026",
-    excerpt: "Students and staff came together for a memorable annual celebration on stage.",
-    date: "2026-06-10",
-    category: "Event",
-    image: "/images/annual-function.png",
-    status: "Published" as const,
-  },
-  {
-    id: "2",
-    title: "Mid-Term Exam Schedule Released",
-    excerpt: "Exam dates and guidelines for Classes VI–XII are now available for parents and students.",
-    date: "2026-06-14",
-    category: "Notice",
-    image: "/images/assembly-hall.png",
-    status: "Published" as const,
-  },
-  {
-    id: "3",
-    title: "Admissions Open for 2026–27",
-    excerpt: "Applications are now being accepted for the new academic session. Limited seats available.",
-    date: "2026-06-01",
-    category: "Admission Update",
-    image: "/images/ribbon-cutting.png",
-    status: "Published" as const,
-  },
-  {
-    id: "4",
-    title: "District Science Exhibition Winners",
-    excerpt: "SK Academy students secured top positions at the district-level science fair.",
-    date: "2026-05-15",
-    category: "Achievement",
-    image: "/images/school-event.png",
-    status: "Published" as const,
-  },
-  {
-    id: "5",
-    title: "Summer Vacation Announcement",
-    excerpt: "School will remain closed during the summer break. Reopening details will follow.",
-    date: "2026-05-20",
-    category: "Announcement",
-    image: "/images/celebration-event.png",
-    status: "Published" as const,
-  },
-  {
-    id: "6",
-    title: "Morning Assembly Highlights",
-    excerpt: "Daily assembly continues to build discipline, values, and unity among our students.",
-    date: "2026-05-28",
-    category: "Event",
-    image: "/images/assembly-prayer.png",
-    status: "Published" as const,
-  },
-];
+export const newsItems = newsArticles;
 
 export const events = [
   {

@@ -3,6 +3,7 @@
 import { ContentImage } from "@/components/public/content-image";
 import { HeroCarousel } from "@/components/public/hero-carousel";
 import { HighlightsCarousel } from "@/components/public/highlights-carousel";
+import { NewsCard } from "@/components/public/news-card";
 import { SectionHeading } from "@/components/public/section-heading";
 import { StatCards } from "@/components/public/stat-cards";
 import { SchoolHighlights } from "@/components/public/school-highlights";
@@ -180,21 +181,7 @@ export function HomePageContent() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sortByDateDesc(news.filter((n) => (n.status ?? "Published") === "Published")).slice(0, 3).map((item) => (
-              <Card key={item.id} className="card-interactive overflow-hidden border-0 bg-white pt-0">
-                <div className="relative aspect-video">
-                  <ContentImage src={item.image} alt={item.title} fill className="object-cover" />
-                </div>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{item.category}</Badge>
-                    <span className="text-xs text-muted-foreground">{item.date}</span>
-                  </div>
-                  <CardTitle className="line-clamp-2 text-lg">{item.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{item.excerpt}</p>
-                </CardContent>
-              </Card>
+              <NewsCard key={item.id} item={item} />
             ))}
           </div>
         </div>

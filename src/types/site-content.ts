@@ -106,6 +106,7 @@ export interface NewsItem {
   id: string;
   title: string;
   excerpt: string;
+  body?: string;
   date: string;
   category: NewsCategory | string;
   image: string;

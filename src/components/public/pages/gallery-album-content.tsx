@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { ContentImage } from "@/components/public/content-image";
+import { GalleryLightbox, GalleryPhotoTile } from "@/components/public/gallery-lightbox";
 import { PageHero } from "@/components/public/page-hero";
 import { PageSection } from "@/components/public/page-section";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ export function GalleryAlbumContent() {
   const params = useParams<{ id: string }>();
   const { content } = useSiteContent();
   const album = content.gallery.find((item) => item.id === params.id);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   if (!album) {
     return (
@@ -43,12 +45,24 @@ export function GalleryAlbumContent() {
         <Badge className="mb-6">{album.category}</Badge>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {photos.map((photo, index) => (
-            <div key={index} className="relative aspect-[4/3] overflow-hidden rounded-xl">
-              <ContentImage src={photo} alt={`${album.title} photo ${index + 1}`} fill className="object-cover" />
-            </div>
+            <GalleryPhotoTile
+              key={`${photo}-${index}`}
+              src={photo}
+              alt={`${album.title} photo ${index + 1}`}
+              onClick={() => setLightboxIndex(index)}
+            />
           ))}
         </div>
       </PageSection>
+
+      <GalleryLightbox
+        photos={photos}
+        currentIndex={lightboxIndex ?? 0}
+        open={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        onIndexChange={setLightboxIndex}
+        title={album.title}
+      />
     </>
   );
 }

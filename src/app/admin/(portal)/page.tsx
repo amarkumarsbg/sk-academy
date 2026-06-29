@@ -9,24 +9,18 @@ import {
   Globe,
   GraduationCap,
   Inbox,
+  Mail,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminLoadingText, AdminStatLoading } from "@/components/admin/admin-loading";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  fetchAdmissionInquiries,
-  fetchContactMessages,
-  type AdmissionInquiryRecord,
-  type ContactMessageRecord,
-} from "@/lib/api";
+import { fetchContactMessages, fetchInboxCounts, type ContactMessageRecord } from "@/lib/api";
 import { useResource } from "@/hooks/use-resource";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { formatTodayLong } from "@/lib/today";
 import { cn } from "@/lib/utils";
-
 const iconMap: Record<string, LucideIcon> = {
   GraduationCap,
   Users,
@@ -43,9 +37,54 @@ const quickActions = [
   { label: "Events", href: "/admin/events", icon: Calendar, iconClass: "text-sky-600", bgClass: "bg-sky-50 hover:bg-sky-100/80" },
 ] as const;
 
-type InboxPreviewItem =
-  | { kind: "contact"; id: string; name: string; detail: string; createdAt: string; status: string }
-  | { kind: "inquiry"; id: string; name: string; detail: string; createdAt: string; status: string };
+function dedupeContactMessages(messages: ContactMessageRecord[]) {
+  const seen = new Map<string, ContactMessageRecord>();
+
+  for (const message of [...messages].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )) {
+    const key = `${message.email.toLowerCase()}|${message.message.trim()}`;
+    if (!seen.has(key)) {
+      seen.set(key, message);
+    }
+  }
+
+  return Array.from(seen.values());
+}
+
+function ContactMessageRow({ message }: { message: ContactMessageRecord }) {
+  const isNew = (message.status ?? "new") === "new";
+  const initial = message.name.trim().charAt(0).toUpperCase() || "?";
+
+  return (
+    <Link
+      href="/admin/inbox"
+      className="flex gap-3 rounded-lg border bg-background px-3 py-2.5 transition-colors hover:border-primary/30 hover:bg-muted/30"
+    >
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+        {initial}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{message.name}</p>
+            <p className="truncate text-xs text-muted-foreground">{message.email}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {isNew && <span className="h-2 w-2 rounded-full bg-amber-500" title="New" />}
+            <span className="text-[11px] text-muted-foreground">
+              {formatRelativeTime(new Date(message.createdAt))}
+            </span>
+          </div>
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{message.message}</p>
+        {message.phone && (
+          <p className="mt-1 text-[11px] text-muted-foreground">{message.phone}</p>
+        )}
+      </div>
+    </Link>
+  );
+}
 
 export default function AdminDashboardPage() {
   const todayLabel = formatTodayLong();
@@ -67,8 +106,8 @@ export default function AdminDashboardPage() {
   }>("events");
 
   const [inboxLoading, setInboxLoading] = useState(true);
+  const [inboxCounts, setInboxCounts] = useState({ contactNew: 0, inquiryNew: 0, total: 0 });
   const [contactMessages, setContactMessages] = useState<ContactMessageRecord[]>([]);
-  const [inquiries, setInquiries] = useState<AdmissionInquiryRecord[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,13 +115,10 @@ export default function AdminDashboardPage() {
     async function loadInbox() {
       setInboxLoading(true);
       try {
-        const [messages, inquiryRows] = await Promise.all([
-          fetchContactMessages(),
-          fetchAdmissionInquiries(),
-        ]);
+        const [counts, messages] = await Promise.all([fetchInboxCounts(), fetchContactMessages()]);
         if (!cancelled) {
+          setInboxCounts(counts);
           setContactMessages(messages);
-          setInquiries(inquiryRows);
         }
       } finally {
         if (!cancelled) setInboxLoading(false);
@@ -95,11 +131,10 @@ export default function AdminDashboardPage() {
     };
   }, []);
 
+  const recentContactMessages = useMemo(() => dedupeContactMessages(contactMessages), [contactMessages]);
+
   const activeStudents = students.filter((s) => s.status === "Active").length;
   const pendingAdmissions = admissions.filter((a) => a.status === "Pending");
-  const newInboxCount =
-    contactMessages.filter((m) => (m.status ?? "new") === "new").length +
-    inquiries.filter((m) => (m.status ?? "new") === "new").length;
 
   const upcomingEvents = useMemo(
     () =>
@@ -109,31 +144,6 @@ export default function AdminDashboardPage() {
         .slice(0, 3),
     [events]
   );
-
-  const recentInbox = useMemo<InboxPreviewItem[]>(() => {
-    const items: InboxPreviewItem[] = [
-      ...contactMessages.map((message) => ({
-        kind: "contact" as const,
-        id: message._id,
-        name: message.name,
-        detail: message.message,
-        createdAt: message.createdAt,
-        status: message.status ?? "new",
-      })),
-      ...inquiries.map((inquiry) => ({
-        kind: "inquiry" as const,
-        id: inquiry._id,
-        name: inquiry.name,
-        detail: `Grade ${inquiry.grade} · ${inquiry.phone}`,
-        createdAt: inquiry.createdAt,
-        status: inquiry.status ?? "new",
-      })),
-    ];
-
-    return items
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 4);
-  }, [contactMessages, inquiries]);
 
   const dashboardStats = [
     {
@@ -153,10 +163,14 @@ export default function AdminDashboardPage() {
       href: "/admin/teachers",
     },
     {
-      label: "New Inbox",
+      label: "Contact Us",
       loading: inboxLoading,
-      value: String(newInboxCount),
-      change: newInboxCount === 0 ? "All caught up" : "Needs attention",
+      value: String(inboxCounts.contactNew),
+      change: inboxLoading
+        ? "Loading..."
+        : inboxCounts.contactNew === 0
+          ? "No new messages"
+          : `${contactMessages.length} total submission${contactMessages.length === 1 ? "" : "s"}`,
       icon: "Inbox" as const,
       href: "/admin/inbox",
     },
@@ -188,9 +202,7 @@ export default function AdminDashboardPage() {
                       ) : (
                         <p className="text-2xl font-bold leading-tight">{stat.value}</p>
                       )}
-                      <p className="truncate text-xs text-muted-foreground">
-                        {stat.loading ? "Loading..." : stat.change}
-                      </p>
+                      <p className="truncate text-xs text-muted-foreground">{stat.change}</p>
                     </div>
                     {Icon && <Icon className="h-5 w-5 shrink-0 text-muted-foreground" />}
                   </CardContent>
@@ -221,41 +233,26 @@ export default function AdminDashboardPage() {
         <div className="mt-3 grid min-h-0 flex-1 gap-3 xl:grid-cols-3">
           <Card className="flex min-h-0 flex-col overflow-hidden xl:col-span-2">
             <CardHeader className="flex shrink-0 flex-row items-center justify-between space-y-0 px-4 py-3">
-              <CardTitle className="text-sm">Recent Inbox</CardTitle>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <CardTitle className="text-sm">Contact Us messages</CardTitle>
+                  <p className="text-xs text-muted-foreground">Latest emails from the website contact form</p>
+                </div>
+              </div>
               <Link href="/admin/inbox" className="text-xs font-medium text-primary hover:underline">
                 View all
               </Link>
             </CardHeader>
-            <CardContent className="min-h-0 flex-1 overflow-hidden px-4 pb-4 pt-0">
+            <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4 pt-0 pr-3">
               {inboxLoading ? (
-                <AdminLoadingText label="Loading inbox..." />
-              ) : recentInbox.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No messages yet.</p>
+                <AdminLoadingText label="Loading messages..." />
+              ) : recentContactMessages.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No contact messages yet.</p>
               ) : (
-                <div className="divide-y">
-                  {recentInbox.map((item) => (
-                    <Link
-                      key={`${item.kind}-${item.id}`}
-                      href="/admin/inbox"
-                      className="flex items-center justify-between gap-3 py-2.5 transition-colors hover:bg-muted/40 first:pt-0"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="truncate text-sm font-medium">{item.name}</p>
-                          {item.status === "new" && (
-                            <Badge className="h-5 shrink-0 bg-amber-500 px-1.5 text-[10px] text-white hover:bg-amber-500">
-                              New
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="truncate text-xs text-muted-foreground">{item.detail}</p>
-                      </div>
-                      <span className="shrink-0 text-[11px] text-muted-foreground">
-                        {formatRelativeTime(new Date(item.createdAt))}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+                recentContactMessages.map((message) => (
+                  <ContactMessageRow key={message._id} message={message} />
+                ))
               )}
             </CardContent>
           </Card>

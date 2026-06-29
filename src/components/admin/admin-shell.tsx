@@ -93,6 +93,22 @@ function AdminNavLink({
   );
 }
 
+function AdminBrandLink({ href, onNavigate }: { href: string; onNavigate?: () => void }) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className="flex min-w-0 items-center gap-2"
+    >
+      <SchoolLogo size="xs" href={null} />
+      <div className="min-w-0">
+        <p className="truncate text-sm font-semibold">{siteConfig.name}</p>
+        <p className="truncate text-xs text-muted-foreground">Admin Portal</p>
+      </div>
+    </Link>
+  );
+}
+
 export function AdminSidebar() {
   const publicSiteUrl = usePublicSiteUrl();
   const loginPath = useAdminLoginPath();
@@ -100,12 +116,8 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden h-dvh w-64 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground md:flex">
-      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
-        <SchoolLogo size="xs" href={dashboardHref} />
-        <div>
-          <p className="text-sm font-semibold">{siteConfig.name}</p>
-          <p className="text-xs text-muted-foreground">Admin Portal</p>
-        </div>
+      <div className="flex h-16 shrink-0 items-center border-b border-border bg-background px-4">
+        <AdminBrandLink href={dashboardHref} />
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
@@ -158,9 +170,8 @@ export function AdminMobileNav() {
         </SheetTrigger>
         <SheetContent side="left" className="w-[min(100vw-2rem,18rem)] p-0">
           <SheetHeader className="border-b px-4 py-4 text-left">
-            <SheetTitle className="flex items-center gap-2">
-              <SchoolLogo size="xs" href={dashboardHref} />
-              {siteConfig.name}
+            <SheetTitle className="p-0 text-base font-normal">
+              <AdminBrandLink href={dashboardHref} onNavigate={() => setOpen(false)} />
             </SheetTitle>
           </SheetHeader>
           <nav className="flex-1 space-y-1 overflow-y-auto p-3">

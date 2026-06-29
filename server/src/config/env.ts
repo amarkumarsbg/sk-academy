@@ -72,3 +72,32 @@ export const env = {
     return `${this.adminPortalUrl}${path}`;
   },
 };
+
+const WEAK_SECRETS = new Set(["change-me", "secret", "jwt-secret", "admin1234"]);
+
+export function validateProductionEnv() {
+  if (!env.isProduction) return;
+
+  const issues: string[] = [];
+
+  if (env.jwtSecret.length < 32 || WEAK_SECRETS.has(env.jwtSecret.toLowerCase())) {
+    issues.push("JWT_SECRET must be at least 32 characters and not a common default.");
+  }
+
+  if (!process.env.ADMIN_PASSWORD || WEAK_SECRETS.has(env.adminPassword)) {
+    issues.push("ADMIN_PASSWORD must be set to a strong value in production.");
+  }
+
+  if (!env.adminUrl) {
+    console.warn("ADMIN_URL is not set — admin CORS may be limited to CLIENT_URL only.");
+  }
+
+  if (!env.emailEnabled) {
+    issues.push("Email is not configured — set SMTP_* or RESEND_API_KEY for form notifications.");
+  }
+
+  if (issues.length > 0) {
+    console.error("Production environment issues:\n" + issues.map((i) => `  - ${i}`).join("\n"));
+    throw new Error("Fix production environment variables before starting the server.");
+  }
+}

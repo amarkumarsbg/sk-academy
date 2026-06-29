@@ -10,6 +10,7 @@ import { AppError } from "../utils/AppError.js";
 import { verifyTurnstile } from "../utils/turnstile.js";
 import { notifyNewAdmissionInquiry, notifyNewContactMessage } from "../services/email.js";
 import { writeAuditLog } from "../services/auditLog.js";
+import { formRateLimiter } from "../middleware/rateLimits.js";
 
 const contactSchema = z.object({
   name: z.string().min(1),
@@ -36,6 +37,7 @@ export const formsRouter = Router();
 
 formsRouter.post(
   "/contact",
+  formRateLimiter,
   asyncHandler(async (req, res) => {
     const data = contactSchema.parse(req.body);
     await verifyTurnstile(data.captchaToken, req.ip);
@@ -83,6 +85,7 @@ formsRouter.patch(
 
 formsRouter.post(
   "/admission-inquiries",
+  formRateLimiter,
   asyncHandler(async (req, res) => {
     const data = inquirySchema.parse(req.body);
     await verifyTurnstile(data.captchaToken, req.ip);

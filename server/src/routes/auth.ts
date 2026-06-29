@@ -16,6 +16,7 @@ import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendPasswordResetEmail } from "../services/email.js";
 import { writeAuditLog } from "../services/auditLog.js";
+import { authRateLimiter } from "../middleware/rateLimits.js";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -42,6 +43,7 @@ export const authRouter = Router();
 
 authRouter.post(
   "/login",
+  authRateLimiter,
   asyncHandler(async (req, res) => {
     const { email, password } = loginSchema.parse(req.body);
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -85,6 +87,7 @@ authRouter.get(
 
 authRouter.post(
   "/forgot-password",
+  authRateLimiter,
   asyncHandler(async (req, res) => {
     const { email } = forgotSchema.parse(req.body);
     const user = await User.findOne({ email: email.toLowerCase() });

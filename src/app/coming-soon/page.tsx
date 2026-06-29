@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ContentImage } from "@/components/public/content-image";
-import { isComingSoonEnabled } from "@/lib/coming-soon";
+import { formatLaunchDate, getLaunchDate, isComingSoonEnabled } from "@/lib/coming-soon";
 import { siteConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -34,6 +34,11 @@ export default function ComingSoonPage() {
             {siteConfig.name}
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl">Coming Soon</h1>
+          {isComingSoonEnabled() && (
+            <p className="text-lg text-muted-foreground">
+              Launching {formatLaunchDate(getLaunchDate())}
+            </p>
+          )}
         </div>
 
         {!isComingSoonEnabled() && (

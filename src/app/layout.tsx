@@ -5,6 +5,7 @@ import { SiteContentProvider } from "@/context/site-content-provider";
 import { defaultSiteContent } from "@/data/default-content";
 import { fetchSiteContent } from "@/lib/api";
 import { mergeStoredSiteContent } from "@/lib/merge-site-content";
+import { getSiteUrl } from "@/lib/media-url";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -27,6 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = settings.seo?.metaDescription || settings.description;
 
   return {
+    metadataBase: new URL(getSiteUrl()),
     title: {
       default: title,
       template: `%s | ${settings.name}`,

@@ -1,4 +1,5 @@
 import { defaultSiteContent } from "@/data/default-content";
+import { isValidMediaUrl } from "@/lib/media-url";
 import { normalizeMapEmbedUrl } from "@/lib/school-map";
 import type { SiteContent } from "@/types/site-content";
 
@@ -20,13 +21,7 @@ function usesStockPhotos(content: SiteContent) {
 }
 
 function usesBrokenMedia(content: SiteContent) {
-  return collectMediaUrls(content).some((url) => {
-    if (!url) return true;
-    if (url.startsWith("data:")) return false;
-    if (url.startsWith("/images/") || url.startsWith("/logo.png")) return false;
-    if (url.startsWith("http")) return true;
-    return true;
-  });
+  return collectMediaUrls(content).some((url) => !isValidMediaUrl(url));
 }
 
 function applySchoolPhotos(content: SiteContent): SiteContent {

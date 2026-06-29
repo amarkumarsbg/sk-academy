@@ -22,7 +22,9 @@ export default function AdminLoginForm() {
   const dashboardPath = useAdminHref("/admin");
   const next = searchParams.get("next") ?? dashboardPath;
 
-  const [email, setEmail] = useState("admin@skacademy.edu");
+  const isProduction = process.env.NODE_ENV === "production";
+
+  const [email, setEmail] = useState(isProduction ? "" : "admin@skacademy.edu");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -86,9 +88,11 @@ export default function AdminLoginForm() {
               {loading ? <AdminButtonSpinner label="Signing in..." /> : "Sign In"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Default: admin@skacademy.edu / admin1234 (after running seed)
-          </p>
+          {!isProduction && (
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              Dev only: use seeded admin credentials after running <code>npm run seed</code>
+            </p>
+          )}
           <div className="mt-4 text-center">
             <Link href={forgotPasswordPath} className="text-sm text-primary hover:underline">
               Forgot password?

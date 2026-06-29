@@ -4,13 +4,15 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import mongoose from "mongoose";
 import { connectDb } from "./config/db.js";
-import { env } from "./config/env.js";
+import { env, validateProductionEnv } from "./config/env.js";
 import { warmUpEmailTransport } from "./services/email.js";
 import { apiRouter } from "./routes/index.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 async function main() {
+  validateProductionEnv();
   await connectDb();
   void warmUpEmailTransport();
 
@@ -46,6 +48,11 @@ async function main() {
   app.use("/api", apiRouter);
 
   app.get("/health", (_req, res) => {
+    const dbReady = mongoose.connection.readyState === 1;
+    if (!dbReady) {
+      res.status(503).json({ status: "degraded", db: "disconnected" });
+      return;
+    }
     res.json({ status: "ok" });
   });
 

@@ -36,12 +36,23 @@ async function seed() {
     console.log("Admin user already exists");
   }
 
-  await SiteContent.findOneAndUpdate(
-    { key: "default" },
-    { content: defaultSiteContent },
-    { upsert: true }
-  );
-  console.log("Seeded site content");
+  const existingContent = await SiteContent.findOne({ key: "default" });
+  const forceSeed = process.env.FORCE_SEED_CONTENT === "true";
+
+  if (existingContent && !forceSeed) {
+    console.log("Site content already exists — skipping (set FORCE_SEED_CONTENT=true to overwrite).");
+  } else {
+    await SiteContent.findOneAndUpdate(
+      { key: "default" },
+      { content: defaultSiteContent },
+      { upsert: true }
+    );
+    console.log(
+      existingContent
+        ? "Site content overwritten from seed (FORCE_SEED_CONTENT=true)."
+        : "Seeded site content"
+    );
+  }
 
   for (const item of students) {
     await Student.findOneAndUpdate({ id: item.id }, item, { upsert: true });

@@ -21,6 +21,9 @@ const admissionInquirySchema = new Schema<IAdmissionInquiry>(
   { timestamps: true }
 );
 
+admissionInquirySchema.index({ status: 1 });
+admissionInquirySchema.index({ createdAt: -1 });
+
 export const AdmissionInquiry = model<IAdmissionInquiry>(
   "AdmissionInquiry",
   admissionInquirySchema

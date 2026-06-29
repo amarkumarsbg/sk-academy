@@ -21,4 +21,7 @@ const contactMessageSchema = new Schema<IContactMessage>(
   { timestamps: true }
 );
 
+contactMessageSchema.index({ status: 1 });
+contactMessageSchema.index({ createdAt: -1 });
+
 export const ContactMessage = model<IContactMessage>("ContactMessage", contactMessageSchema);

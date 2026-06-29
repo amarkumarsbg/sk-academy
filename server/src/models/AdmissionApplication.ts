@@ -27,6 +27,9 @@ const admissionApplicationSchema = new Schema<IAdmissionApplication>(
   { timestamps: true }
 );
 
+admissionApplicationSchema.index({ status: 1 });
+admissionApplicationSchema.index({ createdAt: -1 });
+
 export const AdmissionApplication = model<IAdmissionApplication>(
   "AdmissionApplication",
   admissionApplicationSchema

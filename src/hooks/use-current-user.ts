@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getMe } from "@/lib/api";
+import { getCached, getStale, setCached } from "@/lib/api-cache";
 
 export interface CurrentUser {
   id: string;
@@ -10,13 +11,30 @@ export interface CurrentUser {
   role: string;
 }
 
+const USER_CACHE_KEY = "auth:me";
+
 export function useCurrentUser() {
-  const [user, setUser] = useState<CurrentUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<CurrentUser | null>(() => getStale<CurrentUser>(USER_CACHE_KEY) ?? null);
+  const [loading, setLoading] = useState(!getCached<CurrentUser>(USER_CACHE_KEY));
 
   useEffect(() => {
+    const cached = getCached<CurrentUser>(USER_CACHE_KEY);
+    if (cached) {
+      setUser(cached);
+      setLoading(false);
+      return;
+    }
+
+    const stale = getStale<CurrentUser>(USER_CACHE_KEY);
+    if (!stale) {
+      setLoading(true);
+    }
+
     getMe()
-      .then((res) => setUser(res.user))
+      .then((res) => {
+        setCached(USER_CACHE_KEY, res.user);
+        setUser(res.user);
+      })
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);

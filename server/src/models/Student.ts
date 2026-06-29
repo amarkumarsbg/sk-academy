@@ -27,6 +27,8 @@ const studentSchema = new Schema<IStudent>(
   { timestamps: true }
 );
 
+studentSchema.index({ status: 1 });
+
 function generateNextStudentId(existingIds: string[]): string {
   const numbers = existingIds
     .map((id) => {

@@ -4,6 +4,7 @@ import { siteContentRouter } from "./siteContent.js";
 import { formsRouter } from "./forms.js";
 import { uploadRouter } from "./upload.js";
 import { auditRouter } from "./audit.js";
+import { dashboardRouter } from "./dashboard.js";
 import { createCrudRouter } from "./crudFactory.js";
 import { Student } from "../models/Student.js";
 import { Teacher } from "../models/Teacher.js";
@@ -21,6 +22,7 @@ apiRouter.use("/users", usersRouter);
 apiRouter.use("/site-content", siteContentRouter);
 apiRouter.use("/upload", uploadRouter);
 apiRouter.use("/audit-log", auditRouter);
+apiRouter.use("/dashboard", dashboardRouter);
 apiRouter.use("/", formsRouter);
 
 apiRouter.use("/students", authRequired, createCrudRouter(Student));

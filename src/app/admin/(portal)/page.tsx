@@ -16,11 +16,14 @@ import {
 import { AdminHeader } from "@/components/admin/admin-shell";
 import { AdminLoadingText, AdminStatLoading } from "@/components/admin/admin-loading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchContactMessages, fetchInboxCounts, type ContactMessageRecord } from "@/lib/api";
-import { useResource } from "@/hooks/use-resource";
+import { fetchDashboard, type ContactMessageRecord, type DashboardSummary } from "@/lib/api";
+import { getCached, getStale, setCached } from "@/lib/api-cache";
 import { formatRelativeTime } from "@/lib/format-relative-time";
 import { formatTodayLong } from "@/lib/today";
 import { cn } from "@/lib/utils";
+
+const DASHBOARD_CACHE_KEY = "dashboard:summary";
+
 const iconMap: Record<string, LucideIcon> = {
   GraduationCap,
   Users,
@@ -88,97 +91,85 @@ function ContactMessageRow({ message }: { message: ContactMessageRecord }) {
 
 export default function AdminDashboardPage() {
   const todayLabel = formatTodayLong();
-
-  const { items: students, loading: studentsLoading } = useResource<{ id: string; status: string }>("students");
-  const { items: teachers, loading: teachersLoading } = useResource<{ id: string }>("teachers");
-  const { items: admissions, loading: admissionsLoading } = useResource<{
-    id: string;
-    applicant: string;
-    grade: string;
-    status: string;
-    date: string;
-  }>("admissions");
-  const { items: events, loading: eventsLoading } = useResource<{
-    id: string;
-    title: string;
-    date: string;
-    type: string;
-  }>("events");
-
-  const [inboxLoading, setInboxLoading] = useState(true);
-  const [inboxCounts, setInboxCounts] = useState({ contactNew: 0, inquiryNew: 0, total: 0 });
-  const [contactMessages, setContactMessages] = useState<ContactMessageRecord[]>([]);
+  const [loading, setLoading] = useState(!getCached<DashboardSummary>(DASHBOARD_CACHE_KEY));
+  const [dashboard, setDashboard] = useState<DashboardSummary | undefined>(() =>
+    getStale<DashboardSummary>(DASHBOARD_CACHE_KEY)
+  );
 
   useEffect(() => {
     let cancelled = false;
+    const cached = getCached<DashboardSummary>(DASHBOARD_CACHE_KEY);
 
-    async function loadInbox() {
-      setInboxLoading(true);
-      try {
-        const [counts, messages] = await Promise.all([fetchInboxCounts(), fetchContactMessages()]);
-        if (!cancelled) {
-          setInboxCounts(counts);
-          setContactMessages(messages);
-        }
-      } finally {
-        if (!cancelled) setInboxLoading(false);
-      }
+    if (cached) {
+      setDashboard(cached);
+      setLoading(false);
+      return;
     }
 
-    void loadInbox();
+    const stale = getStale<DashboardSummary>(DASHBOARD_CACHE_KEY);
+    if (!stale) {
+      setLoading(true);
+    }
+
+    void fetchDashboard()
+      .then((data) => {
+        if (!cancelled) {
+          setCached(DASHBOARD_CACHE_KEY, data);
+          setDashboard(data);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const recentContactMessages = useMemo(() => dedupeContactMessages(contactMessages), [contactMessages]);
-
-  const activeStudents = students.filter((s) => s.status === "Active").length;
-  const pendingAdmissions = admissions.filter((a) => a.status === "Pending");
-
-  const upcomingEvents = useMemo(
-    () =>
-      [...events]
-        .filter((event) => event.date >= new Date().toISOString().slice(0, 10))
-        .sort((a, b) => a.date.localeCompare(b.date))
-        .slice(0, 3),
-    [events]
+  const recentContactMessages = useMemo(
+    () => dedupeContactMessages(dashboard?.contactMessages ?? []),
+    [dashboard?.contactMessages]
   );
+
+  const stats = dashboard?.stats;
+  const pendingAdmissions = dashboard?.pendingAdmissions ?? [];
+  const upcomingEvents = dashboard?.upcomingEvents ?? [];
 
   const dashboardStats = [
     {
       label: "Students",
-      loading: studentsLoading,
-      value: String(students.length),
-      change: `${activeStudents} active`,
+      loading,
+      value: String(stats?.students ?? 0),
+      change: `${stats?.activeStudents ?? 0} active`,
       icon: "GraduationCap" as const,
       href: "/admin/students",
     },
     {
       label: "Teachers",
-      loading: teachersLoading,
-      value: String(teachers.length),
+      loading,
+      value: String(stats?.teachers ?? 0),
       change: "On staff",
       icon: "Users" as const,
       href: "/admin/teachers",
     },
     {
       label: "Contact Us",
-      loading: inboxLoading,
-      value: String(inboxCounts.contactNew),
-      change: inboxLoading
+      loading,
+      value: String(stats?.contactNew ?? 0),
+      change: loading
         ? "Loading..."
-        : inboxCounts.contactNew === 0
+        : (stats?.contactNew ?? 0) === 0
           ? "No new messages"
-          : `${contactMessages.length} total submission${contactMessages.length === 1 ? "" : "s"}`,
+          : `${stats?.contactTotal ?? 0} total submission${(stats?.contactTotal ?? 0) === 1 ? "" : "s"}`,
       icon: "Inbox" as const,
       href: "/admin/inbox",
     },
     {
       label: "Admissions",
-      loading: admissionsLoading,
-      value: String(pendingAdmissions.length),
-      change: pendingAdmissions.length === 0 ? "None pending" : "Pending review",
+      loading,
+      value: String(stats?.pendingAdmissions ?? 0),
+      change: (stats?.pendingAdmissions ?? 0) === 0 ? "None pending" : "Pending review",
       icon: "ClipboardList" as const,
       href: "/admin/admissions",
     },
@@ -245,7 +236,7 @@ export default function AdminDashboardPage() {
               </Link>
             </CardHeader>
             <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4 pt-0 pr-3">
-              {inboxLoading ? (
+              {loading ? (
                 <AdminLoadingText label="Loading messages..." />
               ) : recentContactMessages.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No contact messages yet.</p>
@@ -269,7 +260,7 @@ export default function AdminDashboardPage() {
                     View
                   </Link>
                 </div>
-                {admissionsLoading ? (
+                {loading ? (
                   <AdminLoadingText label="Loading..." />
                 ) : pendingAdmissions.length === 0 ? (
                   <p className="text-xs text-muted-foreground">None pending.</p>
@@ -292,7 +283,7 @@ export default function AdminDashboardPage() {
                     View
                   </Link>
                 </div>
-                {eventsLoading ? (
+                {loading ? (
                   <AdminLoadingText label="Loading..." />
                 ) : upcomingEvents.length === 0 ? (
                   <p className="text-xs text-muted-foreground">None scheduled.</p>

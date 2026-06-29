@@ -119,6 +119,35 @@ export async function fetchInboxCounts() {
   return apiFetch<{ contactNew: number; inquiryNew: number; total: number }>("/inbox/counts");
 }
 
+export interface DashboardSummary {
+  stats: {
+    students: number;
+    activeStudents: number;
+    teachers: number;
+    contactNew: number;
+    contactTotal: number;
+    pendingAdmissions: number;
+  };
+  pendingAdmissions: Array<{
+    id: string;
+    applicant: string;
+    grade: string;
+    date: string;
+    status: string;
+  }>;
+  upcomingEvents: Array<{
+    id: string;
+    title: string;
+    date: string;
+    type: string;
+  }>;
+  contactMessages: ContactMessageRecord[];
+}
+
+export async function fetchDashboard() {
+  return apiFetch<DashboardSummary>("/dashboard");
+}
+
 export interface StaffUser {
   _id: string;
   email: string;

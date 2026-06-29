@@ -54,7 +54,7 @@ export default function TeachersPage() {
       ]}
       columns={[
         { key: "id", label: "ID" },
-        { key: "name", label: "Name" },
+        { key: "name", label: "Name", primary: true },
         { key: "subject", label: "Subject" },
         { key: "phone", label: "Phone" },
         { key: "email", label: "Email" },

@@ -42,7 +42,7 @@ function StatusSelect({
 
   return (
     <Select value={status} onValueChange={(v) => onChange(normalizeStatus(v as InboxStatus | undefined))}>
-      <SelectTrigger className="h-8 w-[7.5rem] shrink-0 text-xs">
+      <SelectTrigger className="h-10 w-full min-w-[7.5rem] shrink-0 text-sm sm:w-[7.5rem]">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -163,9 +163,13 @@ export function InboxPageContent() {
           <AdminPageLoading label="Loading inbox..." />
         ) : (
           <Tabs defaultValue="contact">
-            <TabsList>
-              <TabsTrigger value="contact">Contact ({contactNewCount} new)</TabsTrigger>
-              <TabsTrigger value="inquiries">Admissions ({inquiryNewCount} new)</TabsTrigger>
+            <TabsList className="h-auto w-full flex-wrap gap-1 p-1">
+              <TabsTrigger value="contact" className="min-h-9 flex-1 px-2 text-xs sm:flex-none sm:px-3 sm:text-sm">
+                Contact ({contactNewCount} new)
+              </TabsTrigger>
+              <TabsTrigger value="inquiries" className="min-h-9 flex-1 px-2 text-xs sm:flex-none sm:px-3 sm:text-sm">
+                Admissions ({inquiryNewCount} new)
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="contact" className="mt-4 space-y-3">

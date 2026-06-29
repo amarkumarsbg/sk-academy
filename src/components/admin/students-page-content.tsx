@@ -154,6 +154,7 @@ export function StudentsPageContent() {
     {
       key: "photo",
       label: "Photo",
+      hideOnMobile: true,
       render: (row: StudentRecord) => (
         <Avatar size="sm">
           {row.photo ? <AvatarImage src={row.photo} alt={row.name} /> : null}
@@ -162,7 +163,7 @@ export function StudentsPageContent() {
       ),
     },
     { key: "id", label: "ID" },
-    { key: "name", label: "Name" },
+    { key: "name", label: "Name", primary: true },
     { key: "class", label: "Class" },
     { key: "rollNo", label: "Roll No" },
     { key: "parent", label: "Parent" },
@@ -235,7 +236,7 @@ export function StudentsPageContent() {
               }}
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
             <Select
               value={classFilter}
               onValueChange={(v) => {
@@ -243,7 +244,7 @@ export function StudentsPageContent() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Class" />
               </SelectTrigger>
               <SelectContent>
@@ -261,7 +262,7 @@ export function StudentsPageContent() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -287,7 +288,7 @@ export function StudentsPageContent() {
             <p className="text-sm text-muted-foreground">
               Showing {pageStart}-{pageEnd} of {filtered.length} students
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <Button
                 size="sm"
                 variant="outline"

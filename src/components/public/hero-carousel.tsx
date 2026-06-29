@@ -95,7 +95,7 @@ export function HeroCarousel() {
       <button
         type="button"
         onClick={prev}
-        className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25 sm:left-6"
+        className="absolute left-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25 sm:left-6"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-5 w-5" />
@@ -103,25 +103,29 @@ export function HeroCarousel() {
       <button
         type="button"
         onClick={next}
-        className="absolute right-4 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25 sm:right-6 lg:right-16 xl:right-[4.5rem]"
+        className="absolute right-3 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25 sm:right-6 lg:right-16 xl:right-[4.5rem]"
         aria-label="Next slide"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-1.5 sm:bottom-6 sm:gap-2">
         {heroSlides.map((slide, index) => (
           <button
             key={slide.id}
             type="button"
             onClick={() => goTo(index)}
-            className={cn(
-              "h-2 rounded-full transition-all",
-              index === active ? "w-8 bg-accent" : "w-2 bg-white/50 hover:bg-white/80"
-            )}
+            className="flex h-11 w-11 items-center justify-center"
             aria-label={`Go to slide ${index + 1}`}
             aria-current={index === active}
-          />
+          >
+            <span
+              className={cn(
+                "block rounded-full transition-all",
+                index === active ? "h-2.5 w-8 bg-accent" : "h-2.5 w-2.5 bg-white/50"
+              )}
+            />
+          </button>
         ))}
       </div>
     </section>

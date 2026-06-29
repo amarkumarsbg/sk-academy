@@ -80,9 +80,9 @@ export function StaffUsersPageContent() {
     <>
       <AdminHeader title="Staff Users" subtitle="Manage admin portal access" />
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <p className="text-sm text-muted-foreground">Create accounts for school staff who need CMS or portal access.</p>
-          <Button size="sm" onClick={() => setOpen(true)}>
+          <Button className="w-full shrink-0 sm:w-auto" onClick={() => setOpen(true)}>
             Add User
           </Button>
         </div>

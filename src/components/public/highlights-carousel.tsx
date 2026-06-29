@@ -58,11 +58,18 @@ export function HighlightsCarousel() {
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            <ButtonLink href="/news" variant="outline" className="ml-2 hidden sm:inline-flex">
+            <ButtonLink href="/news" variant="outline" className="ml-2 hidden min-h-10 sm:inline-flex">
               View All
               <ArrowRight className="ml-1 h-4 w-4" />
             </ButtonLink>
           </div>
+        </div>
+
+        <div className="mb-4 sm:hidden">
+          <ButtonLink href="/news" variant="outline" className="min-h-10 w-full">
+            View All Highlights
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </ButtonLink>
         </div>
 
         <div
@@ -98,7 +105,7 @@ export function HighlightsCarousel() {
                 </p>
                 <Link
                   href="/news"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary opacity-0 transition group-hover:opacity-100"
+                  className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-primary sm:opacity-0 sm:transition sm:group-hover:opacity-100"
                 >
                   Read more
                   <ArrowRight className="h-3.5 w-3.5" />

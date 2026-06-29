@@ -164,9 +164,9 @@ export function AdminMobileNav() {
   return (
     <div className="flex shrink-0 items-center gap-2 border-b bg-background p-2 md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger render={<Button variant="outline" size="sm" className="shrink-0" />}>
-          <Menu className="h-4 w-4" />
-          Menu
+        <SheetTrigger render={<Button variant="outline" size="default" className="h-10 shrink-0 gap-2 px-3" />}>
+          <Menu className="h-5 w-5" />
+          <span className="sr-only sm:not-sr-only">Menu</span>
         </SheetTrigger>
         <SheetContent side="left" className="w-[min(100vw-2rem,18rem)] p-0">
           <SheetHeader className="border-b px-4 py-4 text-left">
@@ -193,10 +193,8 @@ export function AdminMobileNav() {
         </SheetContent>
       </Sheet>
 
-      <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
-        {visibleAdminNav.slice(0, 4).map((item) => (
-          <AdminNavLink key={item.href} item={item} />
-        ))}
+      <div className="flex min-w-0 flex-1 items-center md:hidden">
+        <p className="truncate text-sm font-medium text-muted-foreground">Admin Portal</p>
       </div>
     </div>
   );
@@ -219,7 +217,12 @@ export function AdminHeader({ title, subtitle, welcome = false }: AdminHeaderPro
 
   const headerSubtitle = welcome
     ? subtitle
-      ? `Welcome back, ${displayName} 👋 · ${subtitle}`
+      ? (
+          <>
+            <span className="sm:hidden">{subtitle}</span>
+            <span className="hidden sm:inline">Welcome back, {displayName} 👋 · {subtitle}</span>
+          </>
+        )
       : `Welcome back, ${displayName} 👋`
     : (subtitle ?? "Staff Portal");
 

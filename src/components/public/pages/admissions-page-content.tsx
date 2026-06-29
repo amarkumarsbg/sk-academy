@@ -90,9 +90,9 @@ export function AdmissionsPageContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               {admissions.importantDates.map((item) => (
-                <div key={item.label} className="flex justify-between gap-4 border-b pb-3 last:border-0 last:pb-0">
+                <div key={item.label} className="flex flex-col gap-1 border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className="text-sm text-muted-foreground">{item.label}</span>
-                  <span className="text-sm font-medium">{item.date}</span>
+                  <span className="text-sm font-medium sm:text-right">{item.date}</span>
                 </div>
               ))}
             </CardContent>

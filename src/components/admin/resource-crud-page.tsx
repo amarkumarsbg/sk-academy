@@ -49,6 +49,8 @@ interface ResourceCrudPageProps<T extends { id: string }> {
     key: keyof T | string;
     label: string;
     render?: (row: T) => React.ReactNode;
+    primary?: boolean;
+    hideOnMobile?: boolean;
   }[];
   emptyItem: T;
   /** ID prefix for auto-generation, e.g. "TCH" → TCH001 */
@@ -207,7 +209,7 @@ export function ResourceCrudPage<T extends { id: string }>({
               </div>
             )}
             {filters.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
                 {filters.map((filter) => (
                   <Select
                     key={filter.key}
@@ -216,7 +218,7 @@ export function ResourceCrudPage<T extends { id: string }>({
                       setFilterValues((prev) => ({ ...prev, [filter.key]: v ?? "All" }))
                     }
                   >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[140px]">
                       <SelectValue placeholder={filter.label} />
                     </SelectTrigger>
                     <SelectContent>

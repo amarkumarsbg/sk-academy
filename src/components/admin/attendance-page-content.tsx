@@ -261,11 +261,11 @@ export function AttendancePageContent() {
                         >
                           <button
                             type="button"
-                            className="flex items-center gap-3 text-left"
+                            className="flex min-h-11 flex-1 items-center gap-3 text-left"
                             onClick={() => togglePresent(student.id)}
                           >
                             <span
-                              className={`flex h-5 w-5 items-center justify-center rounded border ${
+                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded border sm:h-5 sm:w-5 ${
                                 isPresent
                                   ? "border-primary bg-primary text-primary-foreground"
                                   : "border-muted-foreground/40 bg-background"
@@ -278,11 +278,12 @@ export function AttendancePageContent() {
                             </span>
                             <span className="text-xs text-muted-foreground">({student.rollNo})</span>
                           </button>
-                          <div className="flex gap-1">
+                          <div className="flex w-full gap-1 sm:w-auto">
                             {(["Present", "Absent", "Late"] as AttendanceStatus[]).map((s) => (
                               <Button
                                 key={s}
                                 size="sm"
+                                className="min-h-10 flex-1 sm:flex-none"
                                 variant={status === s ? "default" : "outline"}
                                 onClick={() => setStatus(student.id, s)}
                               >

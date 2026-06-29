@@ -80,11 +80,18 @@ export function SchoolLogo({
 
   if (href) {
     return (
-      <Link href={href} className="inline-flex max-w-full shrink-0 items-center">
+      <Link
+        href={href}
+        className={cn("inline-flex max-w-full items-center", showName ? "min-w-0" : "shrink-0")}
+      >
         {inner}
       </Link>
     );
   }
 
-  return <div className="inline-flex max-w-full shrink-0 items-center">{inner}</div>;
+  return (
+    <div className={cn("inline-flex max-w-full items-center", showName ? "min-w-0" : "shrink-0")}>
+      {inner}
+    </div>
+  );
 }

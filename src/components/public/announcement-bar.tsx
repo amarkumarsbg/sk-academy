@@ -18,10 +18,18 @@ export function AnnouncementBar() {
   );
 
   return (
-    <div className="announcement-marquee bg-primary py-2.5 text-primary-foreground">
-      <div className="announcement-marquee__text text-sm tracking-wide">
-        {announcementText}
+    <>
+      <div className="bg-primary px-4 py-2.5 text-center text-sm text-primary-foreground sm:hidden">
+        <p className="leading-snug">{message}</p>
+        <Link href={linkHref} className="mt-1 inline-block font-medium underline underline-offset-2">
+          {linkText}
+        </Link>
       </div>
-    </div>
+      <div className="announcement-marquee hidden bg-primary py-2.5 text-primary-foreground sm:block">
+        <div className="announcement-marquee__text text-sm tracking-wide">
+          {announcementText}
+        </div>
+      </div>
+    </>
   );
 }

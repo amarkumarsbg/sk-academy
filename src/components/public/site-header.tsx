@@ -20,14 +20,14 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="min-w-0 flex-1 sm:hidden">
+          <SchoolLogo size="sm" showName showLocation={false} priority />
+        </div>
         <div className="hidden min-w-0 sm:block">
           <SchoolLogo size="md" showName showLocation={false} priority />
         </div>
-        <div className="sm:hidden">
-          <SchoolLogo size="sm" priority />
-        </div>
 
-        <nav className="hidden items-center gap-0.5 xl:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {publicNav.map((item) => (
             <Link
               key={item.href}
@@ -51,7 +51,7 @@ export function SiteHeader() {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background hover:bg-muted xl:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background hover:bg-muted lg:hidden"
             >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open menu</span>

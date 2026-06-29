@@ -86,7 +86,7 @@ export function NewsDetailContent() {
         )}
 
         <article
-          className="prose prose-base max-w-none text-muted-foreground prose-headings:text-primary prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-strong:text-foreground sm:prose-lg"
+          className="prose prose-base max-w-none overflow-x-auto text-muted-foreground prose-headings:text-primary prose-headings:font-semibold prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-strong:text-foreground prose-img:max-w-full prose-img:h-auto prose-table:block prose-table:max-w-full prose-table:overflow-x-auto sm:prose-lg"
           dangerouslySetInnerHTML={{ __html: articleBody }}
         />
       </PageSection>

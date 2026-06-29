@@ -44,7 +44,7 @@ export default function AdminAdmissionsPage() {
       ]}
       columns={[
         { key: "id", label: "Application ID" },
-        { key: "applicant", label: "Applicant" },
+        { key: "applicant", label: "Applicant", primary: true },
         { key: "grade", label: "Grade" },
         { key: "parentName", label: "Parent" },
         { key: "phone", label: "Phone" },

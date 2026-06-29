@@ -204,18 +204,18 @@ export default function AdminDashboardPage() {
         </div>
 
         <Card className="mt-3 shrink-0">
-          <CardContent className="grid grid-cols-3 gap-2 p-3 sm:grid-cols-6">
+          <CardContent className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 md:grid-cols-6">
             {quickActions.map((action) => (
               <Link
                 key={action.href}
                 href={action.href}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-lg border px-2 py-2.5 text-center transition-colors",
+                  "flex min-h-[4.5rem] flex-col items-center justify-center gap-2 rounded-lg border px-2 py-3 text-center transition-colors",
                   action.bgClass
                 )}
               >
-                <action.icon className={cn("h-4 w-4", action.iconClass)} />
-                <span className="text-[11px] font-medium leading-tight">{action.label}</span>
+                <action.icon className={cn("h-5 w-5", action.iconClass)} />
+                <span className="text-xs font-medium leading-tight">{action.label}</span>
               </Link>
             ))}
           </CardContent>

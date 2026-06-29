@@ -61,6 +61,11 @@ async function main() {
 
   app.listen(env.port, "0.0.0.0", () => {
     console.log(`API server running on port ${env.port}`);
+    console.log(
+      env.cloudinaryEnabled
+        ? `Image storage: Cloudinary (${env.cloudinaryCloudName})`
+        : "Image storage: local uploads folder"
+    );
   });
 }
 

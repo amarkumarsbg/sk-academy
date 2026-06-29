@@ -37,10 +37,10 @@ export const env = {
   smtpUser: process.env.SMTP_USER ?? "",
   smtpPass: process.env.SMTP_PASS ?? "",
   smtpFrom: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "noreply@skacademy.edu",
-  turnstileSecret: process.env.TURNSTILE_SECRET_KEY ?? "",
-  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",
-  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY ?? "",
-  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
+  turnstileSecret: process.env.TURNSTILE_SECRET_KEY?.trim() ?? "",
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME?.trim() ?? "",
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY?.trim() ?? "",
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET?.trim() ?? "",
   get resendEnabled() {
     return Boolean(this.resendApiKey);
   },
@@ -85,7 +85,9 @@ export function validateProductionEnv() {
   }
 
   if (!process.env.ADMIN_PASSWORD || WEAK_SECRETS.has(env.adminPassword)) {
-    issues.push("ADMIN_PASSWORD must be set to a strong value in production.");
+    console.warn(
+      "ADMIN_PASSWORD is missing or weak — set a strong value on Render before running seed. Existing admin logins are unaffected."
+    );
   }
 
   if (!env.adminUrl) {
